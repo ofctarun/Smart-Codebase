@@ -1,0 +1,891 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport"
+    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="theme-color" content="#0d1117" />
+  <meta name="msapplication-TileColor" content="#0d1117" />
+  <title>Login Page</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <style>
+    body,
+    .login-container,
+    .theme-toggle,
+    .bg-gradient,
+    .animated-bg,
+    .footer {
+      transition: background-color 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+        color 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+        border-color 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+        Helvetica, Arial, sans-serif;
+      background-color: #0d1117;
+      /* --primary-bg */
+      color: #c9d1d9;
+      /* --primary-text */
+      -webkit-text-size-adjust: 100%;
+      -ms-text-size-adjust: 100%;
+      text-size-adjust: 100%;
+      overflow-x: hidden;
+      padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+      min-height: -webkit-fill-available;
+      min-height: 100vh;
+    }
+
+    * {
+      -webkit-tap-highlight-color: transparent;
+      -webkit-touch-callout: none;
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
+    }
+
+    .login-container,
+    input,
+    textarea {
+      -webkit-user-select: text;
+      -moz-user-select: text;
+      -ms-user-select: text;
+      user-select: text;
+    }
+
+    .login-container {
+      background-color: #161b22;
+      /* --login-bg */
+      padding: 48px 56px;
+      border-radius: 12px;
+      box-shadow: 0 10px 25px rgba(1, 4, 9, 0.6);
+      /* --login-shadow */
+      text-align: center;
+      width: 100%;
+      max-width: 420px;
+      border: 1px solid #30363d;
+      /* --login-border */
+      height: auto;
+      position: relative;
+      z-index: 1;
+    }
+
+    .login-container h1 {
+      margin-top: 0;
+      margin-bottom: 10px;
+      font-size: 28px;
+      color: #ffffff;
+      /* --login-header-text */
+    }
+
+    .login-container p {
+      margin-bottom: 30px;
+      color: #8b949e;
+      /* --secondary-text */
+      font-size: 16px;
+    }
+
+    .login-btn {
+      width: 100%;
+      padding: 12px;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      transition: background-color 0.3s ease-in-out,
+        transform 0.3s ease-in-out, color 0.3s ease-in-out;
+    }
+
+    #github-login-btn {
+      background-color: #6B46C1;
+      color: #fff;
+      transition: background-color 0.3s ease-in-out,
+        transform 0.3s ease-in-out, color 0.3s ease-in-out;
+    }
+
+    #github-login-btn:hover {
+      background-color: #4C1D95;
+      transform: scale(1.05);
+      color: #fff;
+    }
+
+    #github-login-btn:active {
+      transform: scale(0.98);
+    }
+
+    .footer {
+      position: fixed;
+      left: 0;
+      bottom: 0;
+      width: 100vw;
+      background: #161b22;
+      /* --surface-bg */
+      color: #8b949e;
+      /* --secondary-text */
+      text-align: center;
+      padding: 16px 0 12px 0;
+      font-size: 15px;
+      border-top: 1px solid #30363d;
+      /* --border-color */
+      z-index: 10;
+      box-shadow: 0 -2px 12px rgba(0, 0, 0, 0.04);
+    }
+
+    .footer a {
+      color: #58a6ff;
+      /* --footer-link */
+      text-decoration: none;
+      font-weight: 500;
+      margin-left: 8px;
+    }
+
+    .footer a:hover {
+      text-decoration: underline;
+    }
+
+    .theme-toggle {
+      position: fixed;
+      right: 32px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: #161b22;
+      /* --surface-bg */
+      border: 2px solid #30363d;
+      /* --border-color */
+      border-radius: 28px;
+      box-shadow: 0 4px 24px rgba(0, 0, 0, 0.18);
+      height: 56px;
+      width: 44px;
+      padding: 0;
+      cursor: pointer;
+      z-index: 1000;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+    }
+
+    .theme-toggle:hover {
+      background: #8B5CF6;
+      /* --accent-color */
+      color: #fff;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.22);
+    }
+
+    .theme-toggle i {
+      font-size: 24px;
+      transition: color 0.2s;
+    }
+
+    .bg-gradient {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 0;
+      pointer-events: none;
+      background: linear-gradient(120deg,
+          #161b22,
+          /* --bg-gradient-1 */
+          #0d1117
+          /* --bg-gradient-3 */
+        );
+      opacity: 0.7;
+      transition: background 0.8s;
+      animation: gradientMove 8s ease-in-out infinite;
+    }
+
+    @keyframes gradientMove {
+      0% {
+        background-position: 0% 50%;
+      }
+
+      50% {
+        background-position: 100% 50%;
+      }
+
+      100% {
+        background-position: 0% 50%;
+      }
+    }
+
+    .animated-bg {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    .animated-bg::before,
+    .animated-bg::after {
+      content: "";
+      position: absolute;
+      border-radius: 50%;
+      opacity: 0.18;
+      filter: blur(2px);
+      pointer-events: none;
+    }
+
+    .animated-bg::before {
+      width: 120px;
+      height: 120px;
+      left: 12vw;
+      top: 18vh;
+      background: #c9d1d9;
+      /* --primary-text */
+      animation: floatDot1 12s ease-in-out infinite;
+    }
+
+    .animated-bg::after {
+      width: 80px;
+      height: 80px;
+      left: 70vw;
+      top: 60vh;
+      background: #8b949e;
+      /* --secondary-text */
+      animation: floatDot2 14s ease-in-out infinite;
+    }
+
+    @keyframes floatDot1 {
+      0% {
+        transform: translateY(0) scale(1);
+        opacity: 0.18;
+      }
+
+      40% {
+        transform: translateY(-30px) scale(1.08);
+        opacity: 0.22;
+      }
+
+      60% {
+        transform: translateY(20px) scale(0.95);
+        opacity: 0.15;
+      }
+
+      100% {
+        transform: translateY(0) scale(1);
+        opacity: 0.18;
+      }
+    }
+
+    @keyframes floatDot2 {
+      0% {
+        transform: translateY(0) scale(1);
+        opacity: 0.18;
+      }
+
+      30% {
+        transform: translateY(25px) scale(1.12);
+        opacity: 0.23;
+      }
+
+      70% {
+        transform: translateY(-18px) scale(0.92);
+        opacity: 0.13;
+      }
+
+      100% {
+        transform: translateY(0) scale(1);
+        opacity: 0.18;
+      }
+    }
+
+    #bg-dots,
+    #bg-network {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 1;
+      pointer-events: none;
+      display: block;
+    }
+
+    #bg-network {
+      z-index: -1;
+    }
+
+    .divider {
+      display: flex;
+      align-items: center;
+      text-align: center;
+      margin: 18px 0 10px 0;
+      color: #8b949e;
+      /* --secondary-text */
+      font-size: 15px;
+      user-select: none;
+    }
+
+    .divider::before,
+    .divider::after {
+      content: "";
+      flex: 1;
+      border-bottom: 1px solid #30363d;
+      /* --border-color */
+      margin: 0 10px;
+    }
+
+    .divider span {
+      color: #8b949e;
+      /* --secondary-text */
+      padding: 0 4px;
+      font-weight: 500;
+      font-size: 15px;
+    }
+
+    .guest-link {
+      color: #fff;
+      opacity: 0.85;
+      text-align: center;
+      margin: 10px 0 0 0;
+      font-size: 15px;
+      cursor: pointer;
+      transition: color 0.2s, opacity 0.2s;
+      user-select: none;
+    }
+
+    .guest-link:hover,
+    .guest-link:focus {
+      opacity: 1;
+      color: #58a6ff;
+      /* --footer-link */
+      text-decoration: underline;
+    }
+
+    /* --- Light Theme Overrides --- */
+    body.light-theme {
+      background-color: #f0f2f5;
+      color: #333;
+    }
+
+    body.light-theme .login-container {
+      background-color: #ffffff;
+      border-color: #e0e0e0;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    }
+
+    body.light-theme .login-container h1 {
+      color: #1c1c1c;
+    }
+
+    body.light-theme .login-container p,
+    body.light-theme .footer,
+    body.light-theme .divider,
+    body.light-theme .divider span {
+      color: #6c757d;
+    }
+
+    body.light-theme .footer {
+      background: #fff;
+      border-top-color: #e0e0e0;
+    }
+
+    body.light-theme .footer a,
+    body.light-theme .guest-link:hover,
+    body.light-theme .guest-link:focus {
+      color: #007bff;
+    }
+
+    body.light-theme .theme-toggle {
+      background: #fff;
+      border-color: #e0e0e0;
+    }
+
+    body.light-theme .theme-toggle:hover {
+      background: #238636;
+    }
+
+    body.light-theme .bg-gradient {
+      background: linear-gradient(120deg, #f8fafc, #ffffff);
+    }
+
+    body.light-theme .animated-bg::before {
+      background: #333;
+    }
+
+    body.light-theme .animated-bg::after {
+      background: #6c757d;
+    }
+
+    body.light-theme .divider::before,
+    body.light-theme .divider::after {
+      border-bottom-color: #e0e0e0;
+    }
+
+    body.light-theme .guest-link {
+      color: #222;
+    }
+
+
+    /* --- Animations & Responsive Design (Unchanged) --- */
+    .animate-card-in {
+      animation: cardIn 0.7s cubic-bezier(0.4, 0, 0.2, 1) 0.1s both;
+    }
+
+    @keyframes cardIn {
+      0% {
+        opacity: 0;
+        transform: scale(0.92);
+      }
+
+      80% {
+        opacity: 1;
+        transform: scale(1.03);
+      }
+
+      100% {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    .login-btn i,
+    .guest-link i {
+      opacity: 0;
+      transform: translateY(18px);
+      animation: iconIn 0.7s cubic-bezier(0.4, 0, 0.2, 1) 0.35s both;
+    }
+
+    @keyframes iconIn {
+      0% {
+        opacity: 0;
+        transform: translateY(18px);
+      }
+
+      80% {
+        opacity: 1;
+        transform: translateY(-2px);
+      }
+
+      100% {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @media (min-width: 1400px) {
+      .login-container {
+        max-width: 480px;
+        padding: 56px 64px;
+      }
+
+      .login-container h1 {
+        font-size: 32px;
+      }
+
+      .login-container p {
+        font-size: 18px;
+      }
+    }
+
+    @media (max-width: 1399px) and (min-width: 1200px) {
+      .login-container {
+        max-width: 460px;
+        padding: 52px 60px;
+      }
+    }
+
+    @media (max-width: 1199px) and (min-width: 992px) {
+      .login-container {
+        max-width: 440px;
+        padding: 48px 56px;
+      }
+
+      .theme-toggle {
+        right: 24px;
+      }
+    }
+
+    @media (max-width: 991px) and (min-width: 768px) {
+      .login-container {
+        max-width: 420px;
+        padding: 44px 52px;
+      }
+
+      .login-container h1 {
+        font-size: 26px;
+      }
+
+      .login-container p {
+        font-size: 16px;
+      }
+
+      .theme-toggle {
+        right: 20px;
+        height: 52px;
+        width: 40px;
+      }
+
+      .theme-toggle i {
+        font-size: 22px;
+      }
+
+      .footer {
+        padding: 14px 0 10px 0;
+        font-size: 14px;
+      }
+    }
+
+    @media (max-width: 767px) {
+      body {
+        padding: 20px;
+      }
+
+      .login-container {
+        max-width: 100%;
+        padding: 40px 32px;
+        border-radius: 10px;
+      }
+
+      .login-container h1 {
+        font-size: 24px;
+        margin-bottom: 8px;
+      }
+
+      .login-container p {
+        font-size: 15px;
+        margin-bottom: 24px;
+      }
+
+      .login-btn {
+        padding: 14px;
+        font-size: 16px;
+      }
+
+      .theme-toggle {
+        right: 16px;
+        height: 48px;
+        width: 36px;
+      }
+
+      .theme-toggle i {
+        font-size: 20px;
+      }
+
+      .footer {
+        padding: 12px 0 8px 0;
+        font-size: 13px;
+      }
+
+      .divider {
+        margin: 16px 0 8px 0;
+        font-size: 14px;
+      }
+
+      .guest-link {
+        font-size: 14px;
+        margin: 8px 0 0 0;
+      }
+    }
+
+    @media (max-width: 575px) {
+      body {
+        padding: 16px;
+      }
+
+      .login-container {
+        max-width: 100%;
+        padding: 32px 24px;
+        border-radius: 8px;
+      }
+
+      .login-container h1 {
+        font-size: 22px;
+        margin-bottom: 6px;
+      }
+
+      .login-container p {
+        font-size: 14px;
+        margin-bottom: 20px;
+      }
+
+      .login-btn {
+        padding: 12px;
+      }
+
+      .theme-toggle {
+        right: 12px;
+        height: 44px;
+        width: 32px;
+      }
+
+      .theme-toggle i {
+        font-size: 18px;
+      }
+
+      .footer {
+        padding: 10px 0 6px 0;
+        font-size: 12px;
+      }
+
+      .divider {
+        margin: 14px 0 6px 0;
+        font-size: 13px;
+      }
+
+      .guest-link {
+        font-size: 13px;
+        margin: 6px 0 0 0;
+      }
+
+      .animated-bg::before {
+        width: 80px;
+        height: 80px;
+        left: 8vw;
+        top: 15vh;
+      }
+
+      .animated-bg::after {
+        width: 60px;
+        height: 60px;
+        left: 75vw;
+        top: 65vh;
+      }
+    }
+
+    @media (max-width: 375px) {
+      body {
+        padding: 12px;
+      }
+
+      .login-container {
+        padding: 24px 20px;
+        border-radius: 6px;
+      }
+
+      .login-container h1 {
+        font-size: 20px;
+        margin-bottom: 4px;
+      }
+
+      .login-container p {
+        font-size: 13px;
+        margin-bottom: 16px;
+      }
+
+      .login-btn {
+        padding: 10px;
+        font-size: 15px;
+      }
+
+      .theme-toggle {
+        right: 8px;
+        height: 40px;
+        width: 28px;
+      }
+
+      .theme-toggle i {
+        font-size: 16px;
+      }
+
+      .footer {
+        padding: 8px 0 4px 0;
+        font-size: 11px;
+      }
+
+      .divider {
+        margin: 12px 0 4px 0;
+        font-size: 12px;
+      }
+
+      .guest-link {
+        font-size: 12px;
+        margin: 4px 0 0 0;
+      }
+
+      .animated-bg::before {
+        width: 60px;
+        height: 60px;
+        left: 5vw;
+        top: 12vh;
+      }
+
+      .animated-bg::after {
+        width: 40px;
+        height: 40px;
+        left: 80vw;
+        top: 70vh;
+      }
+    }
+
+    @media (max-height: 500px) and (orientation: landscape) {
+      body {
+        padding: 8px;
+      }
+
+      .login-container {
+        padding: 20px 24px;
+      }
+
+      .login-container h1 {
+        font-size: 20px;
+        margin-bottom: 4px;
+      }
+
+      .login-container p {
+        font-size: 14px;
+        margin-bottom: 16px;
+      }
+
+      .footer {
+        padding: 6px 0 2px 0;
+        font-size: 11px;
+      }
+
+      .theme-toggle {
+        top: 20px;
+        right: 16px;
+      }
+    }
+
+    @media (-webkit-min-device-pixel-ratio: 2),
+    (min-resolution: 192dpi) {
+      .login-container {
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+      }
+    }
+
+    @media print {
+
+      .theme-toggle,
+      .animated-bg,
+      .bg-gradient {
+        display: none !important;
+      }
+
+      .login-container {
+        box-shadow: none !important;
+        border: 1px solid #ccc !important;
+      }
+
+      body {
+        background: white !important;
+        color: black !important;
+      }
+    }
+
+    @media (hover: none) and (pointer: coarse) {
+
+      .theme-toggle,
+      .login-btn,
+      button {
+        min-height: 44px;
+        min-width: 44px;
+      }
+
+      .login-btn,
+      .theme-toggle,
+      .guest-link {
+        transition: transform 0.1s ease, background-color 0.1s ease;
+      }
+
+      .login-btn:active,
+      .theme-toggle:active,
+      .guest-link:active {
+        transform: scale(0.98);
+      }
+    }
+
+    @supports (-webkit-touch-callout: none) {
+      body {
+        height: -webkit-fill-available;
+      }
+
+      .login-container {
+        position: relative;
+      }
+    }
+
+    @supports (-webkit-appearance: none) and (not (-webkit-touch-callout: none)) {
+
+      input,
+      textarea {
+        font-size: 16px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+
+      *,
+      *::before,
+      *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+
+      .animated-bg::before,
+      .animated-bg::after,
+      .bg-gradient {
+        animation: none !important;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="bg-gradient"></div>
+  <div class="animated-bg">
+    <div class="dot1"></div>
+    <div class="dot2"></div>
+    <div class="dot3"></div>
+  </div>
+  <div class="theme-toggle" id="theme-toggle-btn" title="Toggle theme">
+    <i class="fas fa-moon" id="theme-toggle-icon"></i>
+  </div>
+  <div class="login-container animate-card-in">
+    <h1>Welcome Back!</h1>
+    <p>Please log in to continue.</p>
+    <button id="github-login-btn" class="login-btn">
+      <i class="fab fa-github"></i> Login with GitHub
+    </button>
+    <div class="divider"><span>or</span></div>
+    <div class="guest-link" tabindex="0">Continue as Guest</div>
+  </div>
+  <footer class="footer">
+    © 2025 Lumix. All rights reserved. | <a href="#">Privacy Policy</a>
+  </footer>
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const githubLoginButton = document.getElementById("github-login-btn");
+      githubLoginButton.addEventListener("click", () => {
+        const clientId = "Ov23liP4eHuY5M0qNeXr"; // Your GitHub App's Client ID
+        const redirectUri = "http://localhost:3000/callback";
+        const scope = "repo"; // 'repo' scope is required for private repos and commits
+        window.location.href = `https://github.com/login/oauth/authorize?client_id=${clientId}&redirect_uri=${redirectUri}&scope=${scope}`;
+      });
+
+      // Theme toggle logic
+      const themeToggleBtn = document.getElementById("theme-toggle-btn");
+      const themeToggleIcon = document.getElementById("theme-toggle-icon");
+      themeToggleBtn.addEventListener("click", () => {
+        document.body.classList.toggle("light-theme");
+        const isLight = document.body.classList.contains("light-theme");
+        themeToggleIcon.className = isLight ? "fas fa-sun" : "fas fa-moon";
+      });
+    });
+  </script>
+</body>
+
+</html>
