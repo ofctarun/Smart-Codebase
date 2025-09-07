@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#0d1117">
+    <meta name="msapplication-TileColor" content="#0d1117">
+    <title>Repository - GitClone</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link id="hljs-dark-theme" rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css" disabled>
+    <link id="hljs-light-theme" rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css" disabled>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <style>
+        :root {
+            --bg: #0d1117;
+            --card-bg: #161b22;
+            --border: #30363d;
+            --text-primary: #c9d1d9;
+            --text-secondary: #8b949e;
+            --accent: #58a6ff;
+            --hover-bg: #1f6feb26;
+            --btn-green-bg: #6B46C1;
+            --btn-green-hover: #4C1D95;
+        }
+
+        html.light-mode {
+            --bg: #ffffff;
+            --card-bg: #f6f8fa;
+            --border: #d0d7de;
+            --text-primary: #24292f;
+            --text-secondary: #57606a;
+            --accent: #0969da;
+            --hover-bg: #0969da1a;
+        }
+
+        body {
+            font-family: "Inter", sans-serif;
+            background-color: var(--bg);
+            color: var(--text-primary);
+            margin: 0;
+            /* Mobile optimization */
+            -webkit-text-size-adjust: 100%;
+            -ms-text-size-adjust: 100%;
+            text-size-adjust: 100%;
+            /* Prevent horizontal scroll on mobile */
+            overflow-x: hidden;
+            /* Safe area for devices with notches */
+            padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+        }
+
+        /* Mobile-specific optimizations */
+        * {
+            -webkit-tap-highlight-color: transparent;
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+
+        /* Allow text selection for content areas */
+        .content-body, .file-tree-list, #list-view .list-item {
+            -webkit-user-select: text;
+            -moz-user-select: text;
+            -ms-user-select: text;
+            user-select: text;
+        }
+
+        /* Input fields should allow text selection */
+        input, textarea, [contenteditable] {
+            -webkit-user-select: text;
+            -moz-user-select: text;
+            -ms-user-select: text;
+            user-select: text;
+        }
+
+        .header {
+            background-color: var(--card-bg);
+            border-bottom: 1px solid var(--border);
+            padding: 16px 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .theme-toggle {
+            background: none;
+            border: none;
+            color: var(--text-primary);
+            cursor: pointer;
+            font-size: 16px;
+            padding: 8px;
+        }
+
+        .page-container {
+            max-width: 1280px;
+            margin: 24px auto;
+            padding: 0 24px;
+        }
+
+        #breadcrumbs {
+            margin-bottom: 16px;
+            font-size: 18px;
+            color: var(--text-secondary);
+        }
+
+        #breadcrumbs a {
+            color: var(--accent);
+            text-decoration: none;
+        }
+
+        .view-container {
+            display: none;
+        }
+
+        .view-container.active {
+            display: block;
+        }
+
+        #list-view .list-container {
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            overflow: hidden;
+            background-color: var(--card-bg);
+        }
+
+        #list-view .list-item {
+            display: flex;
+            align-items: center;
+            padding: 10px 16px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        #list-view .list-item:hover {
+            background-color: var(--hover-bg);
+        }
+
+        #list-view .list-item a {
+            color: var(--text-primary);
+            text-decoration: none;
+            flex-grow: 1;
+        }
+
+        #list-view .list-item .fa-solid {
+            margin-right: 16px;
+            color: var(--text-secondary);
+        }
+
+        #file-view-wrapper {
+            display: flex;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            height: calc(100vh - 220px);
+            overflow: hidden;
+        }
+
+        .file-tree-pane {
+            width: 300px;
+            flex-shrink: 0;
+            background-color: var(--card-bg);
+            border-right: 1px solid var(--border);
+            overflow-y: auto;
+            padding: 8px;
+        }
+
+        .file-tree-list,
+        .file-tree-list ul {
+            list-style: none;
+            padding-left: 16px;
+            margin: 0;
+        }
+
+        .file-tree-list a {
+            display: block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .file-tree-list a:hover {
+            background-color: var(--hover-bg);
+        }
+
+        .file-tree-list a.active {
+            color: var(--text-primary);
+            font-weight: 600;
+            background-color: #1f6feb66;
+        }
+
+        .folder>a::before {
+            content: '\\f0da';
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            margin-right: 8px;
+            transition: transform 0.1s ease;
+        }
+
+        .folder.open>a::before {
+            transform: rotate(90deg);
+        }
+
+        .folder>ul {
+            display: none;
+        }
+
+        .folder.open>ul {
+            display: block;
+        }
+
+        .content-pane {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            background-color: var(--bg);
+        }
+
+        .content-header {
+            padding: 8px 16px;
+            background-color: var(--card-bg);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .content-body {
+            flex-grow: 1;
+            overflow-y: auto;
+        }
+
+        .content-body pre {
+            margin: 0;
+            padding: 16px;
+        }
+
+        #editor {
+            width: 100%;
+            height: 100%;
+            border: none;
+            background-color: var(--bg);
+            color: var(--text-primary);
+            font-family: monospace;
+            font-size: 14px;
+            padding: 16px;
+            resize: none;
+        }
+
+        .commit-form {
+            padding: 16px;
+            border-top: 1px solid var(--border);
+            background-color: var(--card-bg);
+            display: none;
+        }
+
+        .commit-form.active {
+            display: flex;
+            gap: 16px;
+            align-items: center;
+        }
+
+        .action-btn {
+            background: none;
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .commit-btn {
+            background-color: var(--btn-green-bg);
+            border-color: var(--btn-green-bg);
+        }
+
+        .loader-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(13, 17, 23, 0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        /* Responsive Design - Media Queries */
+        
+        /* Large Desktop (1400px and up) */
+        @media (min-width: 1400px) {
+            .page-container {
+                max-width: 1400px;
+                margin: 24px auto;
+            }
+            #file-view-wrapper {
+                height: calc(100vh - 240px);
+            }
+        }
+
+        /* Desktop (1200px to 1399px) */
+        @media (max-width: 1399px) and (min-width: 1200px) {
+            .page-container {
+                max-width: 1200px;
+                margin: 24px auto;
+            }
+        }
+
+        /* Tablet Landscape (992px to 1199px) */
+        @media (max-width: 1199px) and (min-width: 992px) {
+            .page-container {
+                max-width: 100%;
+                padding: 0 24px;
+            }
+            .file-tree-pane {
+                width: 280px;
+            }
+            #file-view-wrapper {
+                height: calc(100vh - 220px);
+            }
+        }
+
+        /* Tablet Portrait (768px to 991px) */
+        @media (max-width: 991px) and (min-width: 768px) {
+            .page-container {
+                padding: 0 20px;
+            }
+            .header {
+                padding: 16px 20px;
+            }
+            .file-tree-pane {
+                width: 260px;
+            }
+            #file-view-wrapper {
+                height: calc(100vh - 200px);
+            }
+            .content-header {
+                padding: 12px 16px;
+            }
+            .content-body pre {
+                padding: 12px;
+            }
+            #editor {
+                padding: 12px;
+                font-size: 13px;
+            }
+        }
+
+        /* Mobile Large (576px to 767px) */
+        @media (max-width: 767px) and (min-width: 576px) {
+            .page-container {
+                padding: 0 16px;
+            }
+            .header {
+                padding: 12px 16px;
+                flex-wrap: wrap;
+                gap: 12px;
+            }
+            .header-actions {
+                gap: 12px;
+            }
+            #file-view-wrapper {
+                flex-direction: column;
+                height: auto;
+                min-height: calc(100vh - 200px);
+            }
+            .file-tree-pane {
+                width: 100%;
+                height: 200px;
+                border-right: none;
+                border-bottom: 1px solid var(--border);
+            }
+            .content-pane {
+                flex: 1;
+                min-height: 400px;
+            }
+            .content-header {
+                padding: 8px 12px;
+            }
+            .content-body pre {
+                padding: 8px;
+            }
+            #editor {
+                padding: 8px;
+                font-size: 12px;
+            }
+            .commit-form {
+                padding: 12px;
+                flex-direction: column;
+                gap: 12px;
+            }
+            .commit-form input {
+                width: 100%;
+            }
+            .commit-form button {
+                width: 100%;
+            }
+        }
+
+        /* Mobile Small (up to 575px) */
+        @media (max-width: 575px) {
+            .page-container {
+                padding: 0 12px;
+            }
+            .header {
+                padding: 12px;
+                flex-direction: column;
+                gap: 12px;
+                align-items: stretch;
+            }
+            .header-actions {
+                justify-content: center;
+                gap: 16px;
+            }
+            #breadcrumbs {
+                font-size: 16px;
+                margin-bottom: 12px;
+            }
+            #file-view-wrapper {
+                flex-direction: column;
+                height: auto;
+                min-height: calc(100vh - 180px);
+                border-radius: 4px;
+            }
+            .file-tree-pane {
+                width: 100%;
+                height: 180px;
+                border-right: none;
+                border-bottom: 1px solid var(--border);
+                padding: 6px;
+            }
+            .file-tree-list a {
+                padding: 6px 8px;
+                font-size: 13px;
+            }
+            .content-pane {
+                flex: 1;
+                min-height: 350px;
+            }
+            .content-header {
+                padding: 8px 12px;
+                flex-direction: column;
+                gap: 8px;
+                align-items: flex-start;
+            }
+            .content-body pre {
+                padding: 8px;
+                font-size: 12px;
+            }
+            #editor {
+                padding: 8px;
+                font-size: 12px;
+            }
+            .commit-form {
+                padding: 12px;
+                flex-direction: column;
+                gap: 12px;
+            }
+            .commit-form input {
+                width: 100%;
+                font-size: 16px; /* Prevents zoom on iOS */
+            }
+            .commit-form button {
+                width: 100%;
+            }
+            .action-btn {
+                padding: 6px 12px;
+                font-size: 14px;
+            }
+            #list-view .list-item {
+                padding: 8px 12px;
+            }
+            #list-view .list-item a {
+                font-size: 14px;
+            }
+        }
+
+        /* Extra Small Mobile (up to 375px) */
+        @media (max-width: 375px) {
+            .page-container {
+                padding: 0 8px;
+            }
+            .header {
+                padding: 8px;
+            }
+            #breadcrumbs {
+                font-size: 14px;
+                margin-bottom: 8px;
+            }
+            .file-tree-pane {
+                height: 160px;
+                padding: 4px;
+            }
+            .file-tree-list a {
+                padding: 4px 6px;
+                font-size: 12px;
+            }
+            .content-header {
+                padding: 6px 8px;
+            }
+            .content-body pre {
+                padding: 6px;
+                font-size: 11px;
+            }
+            #editor {
+                padding: 6px;
+                font-size: 11px;
+            }
+            .commit-form {
+                padding: 8px;
+            }
+            #list-view .list-item {
+                padding: 6px 8px;
+            }
+        }
+
+        /* Landscape Mobile */
+        @media (max-height: 500px) and (orientation: landscape) {
+            .header {
+                padding: 8px 16px;
+            }
+            .page-container {
+                margin: 12px auto;
+            }
+            #file-view-wrapper {
+                height: calc(100vh - 120px);
+            }
+            .file-tree-pane {
+                height: 120px;
+            }
+        }
+
+        /* High DPI Displays */
+        @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+            .file-tree-list a,
+            .content-body pre,
+            #editor {
+                -webkit-font-smoothing: antialiased;
+                -moz-osx-font-smoothing: grayscale;
+            }
+        }
+
+        /* Print Styles */
+        @media print {
+            .header,
+            .file-tree-pane,
+            .content-header,
+            .commit-form {
+                display: none !important;
+            }
+            .content-pane {
+                border: none !important;
+            }
+            .content-body {
+                overflow: visible !important;
+            }
+            .page-container {
+                padding: 0 !important;
+                margin: 0 !important;
+            }
+        }
+
+        /* Mobile-specific touch improvements */
+        @media (hover: none) and (pointer: coarse) {
+            /* Increase touch targets on touch devices */
+            .theme-toggle, .action-btn, button {
+                min-height: 44px;
+                min-width: 44px;
+            }
+            
+            /* Improve touch scrolling */
+            .file-tree-pane, .content-body, .page-container {
+                -webkit-overflow-scrolling: touch;
+                overflow-scrolling: touch;
+            }
+            
+            /* Better touch feedback */
+            .list-item, button, .file-tree-list a {
+                transition: transform 0.1s ease, background-color 0.1s ease;
+            }
+            
+            .list-item:active, button:active, .file-tree-list a:active {
+                transform: scale(0.98);
+            }
+        }
+
+        /* iOS Safari specific fixes */
+        @supports (-webkit-touch-callout: none) {
+            body {
+                /* Fix for iOS Safari 100vh issue */
+                height: -webkit-fill-available;
+            }
+            
+            #file-view-wrapper {
+                /* Fix viewport height on iOS */
+                height: -webkit-fill-available;
+            }
+        }
+
+        /* Android Chrome specific fixes */
+        @supports (-webkit-appearance: none) and (not (-webkit-touch-callout: none)) {
+            input, textarea, #editor {
+                /* Fix input zoom on Android */
+                font-size: 16px;
+            }
+        }
+
+        /* Accessibility - Reduced Motion */
+        @media (prefers-reduced-motion: reduce) {
+            *,
+            *::before,
+            *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+
+        /* Dark Mode Support */
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg: #0d1117;
+                --card-bg: #161b22;
+                --border: #30363d;
+                --text-primary: #c9d1d9;
+                --text-secondary: #8b949e;
+                --accent: #58a6ff;
+                --hover-bg: #1f6feb26;
+                --btn-green-bg: #238636;
+                --btn-green-hover: #2ea043;
+            }
+        }
+
+        @media (prefers-color-scheme: light) {
+            :root {
+                --bg: #ffffff;
+                --card-bg: #f6f8fa;
+                --border: #d0d7de;
+                --text-primary: #24292f;
+                --text-secondary: #57606a;
+                --accent: #0969da;
+                --hover-bg: #0969da1a;
+                --btn-green-bg: #238636;
+                --btn-green-hover: #2ea043;
+            }
+        }
+    </style>
+    <script>
+        const savedTheme = localStorage.getItem('theme') || 'dark';
+        document.documentElement.className = savedTheme + '-mode';
+        document.getElementById(savedTheme === 'light' ? 'hljs-light-theme' : 'hljs-dark-theme').removeAttribute('disabled');
+    </script>
+</head>
+
+<body>
+    <div id="loader" class="loader-overlay">
+        <div class="spinner"></div><span id="loader-text"></span>
+    </div>
+    <header class="header">
+        <div class="logo" id="header-logo"></div>
+        <div class="header-actions">
+            <button id="theme-toggle" class="theme-toggle" aria-label="Toggle theme"><i class="fa-solid fa-sun"></i><i
+                    class="fa-solid fa-moon"></i></button>
+            <button id="logout-btn"><i class="fa-solid fa-arrow-right-from-bracket"></i> Logout</button>
+        </div>
+    </header>
+    <main id="app-container" class="page-container" style="visibility: hidden;">
+        <div id="breadcrumbs"></div>
+        <div id="list-view" class="view-container"></div>
+        <div id="file-view" class="view-container">
+            <div id="file-view-wrapper">
+                <aside class="file-tree-pane"></aside>
+                <section class="content-pane"></section>
+            </div>
+            <div class="commit-form" id="commit-form"></div>
+        </div>
+    </main>
+    <script>
+        const params = new URLSearchParams(window.location.search), owner = params.get('owner'), repo = params.get('repo');
+        let fullFileTree = null, currentFileSha = null, originalFileContent = '';
+        const showLoader = (text) => { document.getElementById('loader-text').textContent = text; document.getElementById('loader').style.display = 'flex'; };
+        const hideLoader = () => document.getElementById('loader').style.display = 'none';
+        const applyTheme = (theme) => { document.documentElement.className = theme + '-mode'; localStorage.setItem('theme', theme); document.getElementById('hljs-dark-theme').disabled = theme === 'light'; document.getElementById('hljs-light-theme').disabled = theme === 'dark'; };
+        const toggleTheme = () => applyTheme(localStorage.getItem('theme') === 'dark' ? 'light' : 'dark');
+        const renderBreadcrumbs = (path) => { const parts = path.split('/').filter(p => p); let html = `<a href="#" data-path="">${repo}</a> / `; let p_acc = ''; parts.forEach((p, i) => { p_acc += p; if (i === parts.length - 1 && !path.endsWith('/')) { html += `<span>${p}</span>`; } else { p_acc += '/'; html += `<a href="#" data-path="${p_acc.slice(0, -1)}">${p}</a> / `; } }); document.getElementById('breadcrumbs').innerHTML = html; };
+        const renderListView = async (path = '') => { document.getElementById('file-view').classList.remove('active'); document.getElementById('list-view').classList.add('active'); const c = document.getElementById('list-view'); c.innerHTML = '<div class="spinner"></div>'; renderBreadcrumbs(path); try { const res = await fetch(`/api/repo-contents?owner=${owner}&repo=${repo}&path=${encodeURIComponent(path)}`); if (!res.ok) throw new Error('Could not load contents.'); const contents = await res.json(); c.innerHTML = `<div class="list-container">${path !== '' ? `<div class="list-item"><i class="fa-solid fa-arrow-turn-up"></i> <a href="#" data-path="${path.substring(0, path.lastIndexOf('/'))}" data-type="dir">..</a></div>` : ''}${contents.map(item => `<div class="list-item"><i class="fa-solid ${item.type === 'dir' ? 'fa-folder' : 'fa-file'}"></i> <a href="#" data-path="${item.path}" data-type="${item.type}">${item.name}</a></div>`).join('')}</div>`; } catch (e) { c.innerHTML = `<p>${e.message}</p>`; } };
+        const renderFileView = async (path) => { document.getElementById('list-view').classList.remove('active'); document.getElementById('file-view').classList.add('active'); renderBreadcrumbs(path); if (!fullFileTree) { try { const res = await fetch(`/api/repo-tree?owner=${owner}&repo=${repo}`); fullFileTree = buildSideFileTree(await res.json().then(d => d.tree)); document.querySelector('.file-tree-pane').innerHTML = `<ul class="file-tree-list">${fullFileTree.map(n => createSideTreeElement(n)).join('')}</ul>`; } catch (e) { } } await loadFileContent(path, true); };
+        const loadFileContent = async (path, isInitial = false) => { if (isInitial) switchToViewMode(false); const filename = path.split('/').pop(); const contentPane = document.querySelector('.content-pane'); contentPane.innerHTML = `<div class="content-header"><span id="content-filename">${filename}</span><div id="file-actions"></div></div><div class="content-body"><div class="spinner"></div></div>`; try { const res = await fetch(`/api/file-content?owner=${owner}&repo=${repo}&path=${encodeURIComponent(path)}`); if (!res.ok) throw new Error('File not found.'); const data = await res.json(); originalFileContent = data.content; currentFileSha = data.sha; const isImage = /\.(jpg|jpeg|png|gif|svg|webp)$/i.test(path); if (isImage) { document.querySelector('.content-body').innerHTML = `<img src="data:image;base64,${originalFileContent}"/>`; } else { document.getElementById('file-actions').innerHTML = `<button id="edit-btn" class="action-btn"><i class="fa-solid fa-pencil"></i></button>`; document.getElementById('edit-btn').onclick = () => switchToEditMode(filename); const pre = document.createElement('pre'), code = document.createElement('code'); code.className = `language-${path.split('.').pop()}`; code.textContent = originalFileContent; pre.appendChild(code); const body = document.querySelector('.content-body'); body.innerHTML = ''; body.appendChild(pre); hljs.highlightElement(code); } } catch (e) { document.querySelector('.content-body').innerHTML = `<p>${e.message}</p>`; } openTreeToFile(path); };
+        const switchToEditMode = (name) => { document.querySelector('.content-pane').innerHTML = `<div class="content-header"><span>Editing ${name}</span></div><div class="content-body" style="padding:0;"><textarea id="editor">${originalFileContent}</textarea></div>`; document.getElementById('commit-form').classList.add('active'); document.getElementById('commit-message').value = `Update ${name}`; };
+        const switchToViewMode = (reload = true) => { document.getElementById('commit-form').classList.remove('active'); if (reload) renderFileView(new URLSearchParams(window.location.search).get('file')); };
+        const handleCommit = async () => { showLoader('Committing...'); const path = new URLSearchParams(window.location.search).get('file'); const res = await fetch('/api/commit-file', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ owner, repo, path, message: document.getElementById('commit-message').value, content: document.getElementById('editor').value, sha: currentFileSha }) }); hideLoader(); if (!res.ok) { alert(`Error: ${await res.json().then(d => d.error)}`); } else { const data = await res.json(); currentFileSha = data.data.content.sha; originalFileContent = document.getElementById('editor').value; switchToViewMode(); } };
+        const buildSideFileTree = (files) => { const map = {}, roots = []; files.forEach(f => { map[f.path] = f; f.children = []; }); files.forEach(f => { const p = f.path.substring(0, f.path.lastIndexOf('/')); if (p && map[p]) { map[p].children.push(f); } else { roots.push(f); } }); return roots; };
+        const createSideTreeElement = (n) => { if (n.type === 'tree' || n.children.length > 0) { return `<li class="folder"><a href="#" data-path="${n.path}" data-type="dir">${n.path.split('/').pop()}</a><ul>${n.children.sort((a, b) => (a.type === 'tree' ? -1 : 1) - (b.type === 'tree' ? -1 : 1) || a.path.localeCompare(b.path)).map(c => createSideTreeElement(c)).join('')}</ul></li>`; } return `<li class="file"><a href="#" data-path="${n.path}" data-type="file">${n.path.split('/').pop()}</a></li>`; };
+        const openTreeToFile = (path) => { document.querySelectorAll('.file-tree-pane a').forEach(el => el.classList.remove('active')); const link = document.querySelector(`.file-tree-pane a[data-path="${path}"]`); if (link) { link.classList.add('active'); let p = link.parentElement.closest('.folder'); while (p) { p.classList.add('open'); p = p.parentElement.closest('.folder'); } } };
+        const handleNavigation = (e) => { const link = e.target.closest('a[data-path]'); if (!link) return; e.preventDefault(); const path = link.dataset.path, type = link.dataset.type, url = new URL(window.location); url.searchParams.delete('file'); url.searchParams.set('path', path); if (type === 'file') { url.searchParams.delete('path'); url.searchParams.set('file', path); history.pushState({ path }, '', url); renderFileView(path); } else { history.pushState({ path }, '', url); renderListView(path); } };
+        window.addEventListener('popstate', () => { const p = new URLSearchParams(window.location.search); const file = p.get('file'), path = p.get('path') || ''; if (file) { renderFileView(file); } else { renderListView(path); } });
+        window.onload = async () => { document.getElementById('loader').style.display = 'flex'; document.getElementById('loader-text').textContent = "Loading..."; if (!owner || !repo) return; document.getElementById('header-logo').innerHTML = `<a href="/dashboard.html">${owner}/<strong>${repo}</strong></a>`; document.getElementById('logout-btn').addEventListener('click', () => fetch('/logout').then(() => window.location.href = '/index.html')); document.getElementById('theme-toggle').addEventListener('click', toggleTheme); document.getElementById('app-container').addEventListener('click', handleNavigation); document.querySelector('.file-tree-pane').addEventListener('click', e => { const a = e.target.closest('a'); if (a && a.dataset.type === 'dir') { a.parentElement.classList.toggle('open'); } }); document.getElementById('commit-form').innerHTML = `<input type="text" id="commit-message"><button id="commit-cancel-btn" class="action-btn">Cancel</button><button id="commit-save-btn" class="action-btn commit-btn">Commit changes</button>`; document.getElementById('commit-cancel-btn').onclick = () => switchToViewMode(true); document.getElementById('commit-save-btn').onclick = handleCommit; const file = params.get('file'), path = params.get('path') || ''; if (file) { await renderFileView(file); } else { await renderListView(path); } document.getElementById('loader').style.display = 'none'; document.getElementById('app-container').style.visibility = 'visible'; };
+    </script>
+</body>
+
+</html>

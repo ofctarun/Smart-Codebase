@@ -1,0 +1,3311 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#0d1117">
+    <meta name="msapplication-TileColor" content="#0d1117">
+    <title>Dashboard - GitClone</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0d1117;
+            --card-bg: #161b22;
+            --border: #30363d;
+            --text-primary: #c9d1d9;
+            --text-secondary: #8b949e;
+            --accent: #58a6ff;
+            --input-bg: #010409;
+            --green: #6B46C1;
+            --green-hover: #4C1D95;
+            --blue: #58a6ff;
+            --sidebar-width: 320px;
+            /* Contribution Graph Colors - Dark Purple */
+--contrib-l0: #161b22;  /* No contribution - Background color */
+--contrib-l1: #2D1D54;  /* A new, very dark purple for the first step */
+--contrib-l2: #4C1D95;  /* Your --dark-purple */
+--contrib-l3: #6B46C1;  /* Your --primary-purple */
+--contrib-l4: #8B5CF6;  /* Your --accent-purple */
+        }
+
+        html.light-mode {
+            --bg: #ffffff;
+            --card-bg: #f6f8fa;
+            --border: #d0d7de;
+            --text-primary: #24292f;
+            --text-secondary: #57606a;
+            --accent: #0969da;
+            --input-bg: #f6f8fa;
+            /* Contribution Graph Colors - Light */
+            --contrib-l0: #ebedf0;
+            --contrib-l1: #9be9a8;
+            --contrib-l2: #40c463;
+            --contrib-l3: #30a14e;
+            --contrib-l4: #216e39;
+        }
+
+        body {
+            font-family: "Inter", sans-serif;
+            background-color: var(--bg);
+            color: var(--text-primary);
+            margin: 0;
+            /* Mobile optimization */
+            -webkit-text-size-adjust: 100%;
+            -ms-text-size-adjust: 100%;
+            text-size-adjust: 100%;
+            /* Prevent horizontal scroll on mobile */
+            overflow-x: hidden;
+            /* Safe area for devices with notches */
+            padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+        }
+
+        /* Mobile-specific optimizations */
+        * {
+            -webkit-tap-highlight-color: transparent;
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+
+        /* Allow text selection for content areas */
+        .repo-card, .search-container, .profile-modal-content, .modal-content {
+            -webkit-user-select: text;
+            -moz-user-select: text;
+            -ms-user-select: text;
+            user-select: text;
+        }
+
+        /* Input fields should allow text selection */
+        input, textarea, [contenteditable] {
+            -webkit-user-select: text;
+            -moz-user-select: text;
+            -ms-user-select: text;
+            user-select: text;
+        }
+
+        .header {
+            background-color: var(--card-bg);
+            border-bottom: 1px solid var(--border);
+            padding: 12px 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+        }
+
+        .logo-link {
+            color: var(--text-primary);
+            text-decoration: none;
+            font-size: 24px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .logo-icon {
+            color: var(--green);
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .avatar-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0;
+            border-radius: 50%;
+            overflow: hidden;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .avatar-img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .mobile-menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            color: var(--text-primary);
+            cursor: pointer;
+            font-size: 18px;
+            padding: 8px;
+            border-radius: 6px;
+            transition: background-color 0.2s ease;
+        }
+
+        .mobile-menu-toggle:hover {
+            background-color: var(--hover-bg);
+        }
+
+        .header .logo a {
+            color: var(--text-primary);
+            text-decoration: none;
+            font-size: 24px;
+            font-weight: 600;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .theme-toggle {
+            background: none;
+            border: none;
+            color: var(--text-primary);
+            cursor: pointer;
+            font-size: 16px;
+            padding: 8px;
+        }
+
+        .theme-toggle .fa-sun {
+            display: none;
+        }
+
+        html.light-mode .theme-toggle .fa-sun {
+            display: inline-block;
+        }
+
+        html.light-mode .theme-toggle .fa-moon {
+            display: none;
+        }
+
+        #logout-btn {
+            background: none;
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        .main-container {
+            display: flex;
+            gap: 32px;
+            padding: 24px 32px;
+            max-width: 1280px;
+            margin: auto;
+        }
+
+        .profile-sidebar {
+            flex: 0 0 296px;
+        }
+
+        .profile-avatar {
+            width: 296px;
+            height: 296px;
+            border-radius: 50%;
+            border: 1px solid var(--border);
+        }
+
+        .profile-name {
+            font-size: 24px;
+            font-weight: 600;
+            margin: 16px 0 4px 0;
+            line-height: 1.25;
+        }
+
+        .profile-login {
+            font-size: 20px;
+            color: var(--text-secondary);
+            margin-bottom: 16px;
+        }
+
+        .profile-details {
+            list-style: none;
+            padding: 0;
+            margin-top: 16px;
+            font-size: 14px;
+        }
+
+        .profile-details li {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+            color: var(--text-secondary);
+        }
+
+        .profile-details .fa-solid,
+        .profile-details .fa-brands {
+            width: 16px;
+            text-align: center;
+        }
+
+        .main-content {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .page-tabs {
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 24px;
+        }
+
+        .tab-link {
+            display: inline-block;
+            padding: 8px 16px;
+            margin-bottom: -1px;
+            border: 1px solid transparent;
+            text-decoration: none;
+            color: var(--text-primary);
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .tab-link.active {
+            font-weight: 600;
+            border-bottom: 2px solid #f78166;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .section-header h2 {
+            font-size: 16px;
+            font-weight: 600;
+            margin: 0;
+        }
+
+        .repo-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .repo-grid-item {
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 16px;
+        }
+
+        .repo-grid-item a {
+            color: var(--accent);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .repo-grid-item .repo-meta {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-top: 8px;
+        }
+
+        .language-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 4px;
+        }
+
+        /* Contribution Graph Styles */
+        .contrib-wrapper {
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 16px;
+        }
+
+        .contrib-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            font-size: 14px;
+        }
+
+        .contrib-calendar {
+            display: block;
+            width: 100%;
+        }
+
+        .contrib-calendar .months {
+            fill: var(--text-secondary);
+            font-size: 12px;
+        }
+
+        .contrib-calendar .wday {
+            fill: var(--text-secondary);
+            font-size: 10px;
+        }
+
+        .contrib-cell {
+            stroke: var(--bg);
+            stroke-width: 2px;
+            rx: 2;
+            ry: 2;
+        }
+
+        .contrib-cell[data-level="0"] {
+            fill: var(--contrib-l0);
+        }
+
+        .contrib-cell[data-level="1"] {
+            fill: var(--contrib-l1);
+        }
+
+        .contrib-cell[data-level="2"] {
+            fill: var(--contrib-l2);
+        }
+
+        .contrib-cell[data-level="3"] {
+            fill: var(--contrib-l3);
+        }
+
+        .contrib-cell[data-level="4"] {
+            fill: var(--contrib-l4);
+        }
+
+        .contrib-tooltip {
+            position: absolute;
+            background-color: #1f2937;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.2s;
+            white-space: nowrap;
+            z-index: 10;
+        }
+
+        /* Repositories & Search Styles */
+        .search-container {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        #repo-search,
+        #ai-search {
+            width: 100%;
+            background-color: var(--input-bg);
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        #ai-search-btn {
+            background-color: #238636;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        #ai-results-container {
+            margin-bottom: 24px;
+        }
+
+        .repo-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        #repositories .repo-list {
+            min-height: 400px;
+        }
+
+        .repo-list-item {
+            border-top: 1px solid var(--border);
+            padding: 16px;
+        }
+
+        .repo-list-item:last-child {
+            border-bottom: 1px solid var(--border);
+        }
+
+        .pagination-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 16px;
+            border-top: 1px solid var(--border);
+            margin-top: 16px;
+        }
+
+        .pagination-btn {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border);
+            color: var(--accent);
+            padding: 5px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .pagination-btn:disabled {
+            color: var(--text-secondary);
+            cursor: not-allowed;
+            border-color: transparent;
+        }
+
+        .loader-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: var(--bg);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+        }
+
+        .spinner {
+            width: 48px;
+            height: 48px;
+            border: 4px solid var(--border);
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+        .dashboard-layout {
+            display: flex;
+            height: calc(100vh - 56px);
+            background: var(--bg);
+            visibility: visible;
+        }
+        .sidebar {
+            width: var(--sidebar-width);
+            background: var(--card-bg);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            padding: 0 0 0 0;
+            overflow-y: auto;
+        }
+        .sidebar-header {
+            padding: 24px 24px 8px 24px;
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .sidebar-search {
+            padding: 0 24px 16px 24px;
+        }
+        .sidebar-search input {
+            width: 100%;
+            padding: 8px 12px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            background: var(--input-bg);
+            color: var(--text-primary);
+            font-size: 15px;
+            outline: none;
+            transition: border 0.2s;
+        }
+        .sidebar-search input:focus {
+            border: 1.5px solid var(--green);
+        }
+        .repo-list {
+            list-style: none;
+            margin: 0;
+            padding: 0 8px 0 8px;
+            overflow-y: auto;
+            flex: 1;
+        }
+        .repo-list-item {
+            background: var(--card-bg);
+            border-radius: 10px;
+            margin-bottom: 8px;
+            padding: 14px 16px 10px 16px;
+            display: flex;
+            flex-direction: column;
+            box-shadow: none;
+            border: 1px solid transparent;
+            transition: border 0.2s, background 0.2s;
+            cursor: pointer;
+        }
+        .repo-list-item:hover, .repo-list-item:focus {
+            border: 1.5px solid var(--green);
+            background: #20262e;
+        }
+        .repo-list-item .repo-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .repo-list-item .repo-name {
+            font-weight: 700;
+            font-size: 17px;
+            color: var(--text-primary);
+            text-decoration: none;
+            border-bottom: 2px solid transparent;
+            transition: border 0.2s;
+        }
+        .repo-list-item .repo-name:hover {
+            border-bottom: 2px solid var(--blue);
+            color: var(--blue);
+        }
+        .repo-list-item .repo-meta {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 4px;
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+        .repo-list-item .repo-lang {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .repo-list-item .repo-lang-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+        .repo-list-item .repo-private {
+            background: #222b36;
+            color: var(--text-secondary);
+            border-radius: 6px;
+            padding: 2px 8px;
+            font-size: 12px;
+            margin-left: 6px;
+        }
+        .repo-list-item .repo-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .repo-list-item .star-btn {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 16px;
+            border-radius: 50%;
+            padding: 4px;
+            transition: background 0.2s, color 0.2s;
+        }
+        .repo-list-item .star-btn.pinned, .repo-list-item .star-btn:hover {
+            color: var(--green);
+            background: #1a242f;
+        }
+        /* Hide scrollbars for sidebar on Chrome/Edge */
+        .sidebar::-webkit-scrollbar, .repo-list::-webkit-scrollbar {
+            width: 8px;
+            background: transparent;
+        }
+        .sidebar::-webkit-scrollbar-thumb, .repo-list::-webkit-scrollbar-thumb {
+            background: #222b36;
+            border-radius: 8px;
+        }
+        /* Modal overlay for repo file explorer */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(13, 17, 23, 0.92);
+            z-index: 2000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.2s;
+        }
+        .modal {
+            background: var(--card-bg);
+            border-radius: 16px;
+            box-shadow: 0 8px 40px #000a;
+            min-width: 540px;
+            max-width: 700px;
+            max-height: 80vh;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            padding: 0 0 16px 0;
+            position: relative;
+        }
+        .modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 24px 32px 12px 32px;
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        .modal-close {
+            background: var(--green);
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-size: 22px;
+            width: 36px;
+            height: 36px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
+        }
+        .modal-close:hover {
+            background: var(--green-hover);
+        }
+        .modal-file-list {
+            overflow-y: auto;
+            padding: 0 32px 0 32px;
+            flex: 1;
+        }
+        .modal-file-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #181c22;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            padding: 12px 18px;
+            color: var(--text-primary);
+            font-size: 16px;
+            transition: background 0.2s;
+        }
+        .modal-file-row:hover {
+            background: #23272f;
+        }
+        .modal-file-row .file-link {
+            color: var(--blue);
+            text-decoration: none;
+            font-weight: 500;
+            cursor: pointer;
+            transition: text-decoration 0.2s, color 0.2s;
+        }
+        .modal-file-row .file-link:hover {
+            text-decoration: underline;
+            color: #7fd7ff;
+        }
+        .modal-file-row .file-icon {
+            font-size: 18px;
+            margin-right: 12px;
+        }
+        /* Profile/Avatar Modal */
+        .profile-modal-overlay {
+            position: fixed;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            left: 0;
+            background: rgba(13, 17, 23, 0.92);
+            z-index: 2200;
+            display: flex;
+            justify-content: flex-end;
+            align-items: stretch;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+        .profile-modal-overlay.show {
+            opacity: 1;
+            visibility: visible;
+        }
+        .profile-modal {
+            position: fixed;
+            top: 0;
+            right: 0;
+            height: 100vh;
+            width: 340px;
+            min-width: 280px;
+            max-width: 98vw;
+            margin: 0;
+            border-radius: 1.5rem 0 0 1.5rem;
+            box-shadow: -4px 0 32px 0 rgba(20, 20, 30, 0.18);
+            background: #161b22;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: #c9d1d9;
+            font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
+            padding: 2.5rem 1.5rem 1.5rem 1.5rem;
+            min-height: 100vh;
+            transform: translateX(100%);
+            transition: transform 0.3s ease;
+        }
+        .profile-modal-overlay.show .profile-modal {
+            transform: translateX(0);
+        }
+        .profile-modal-content {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 0;
+        }
+        .profile-avatar-container {
+            background: linear-gradient(120deg, #21262d 60%, #30363d 100%);
+            border-radius: 50%;
+            padding: 6px;
+            margin-bottom: 1.25rem;
+            box-shadow: 0 0 0 4px #0d1117, 0 0 12px 2px #23863633;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .profile-avatar {
+            width: 88px;
+            height: 88px;
+            border-radius: 50%;
+            border: 2.5px solid #21262d;
+            object-fit: cover;
+            background: #0d1117;
+            box-shadow: 0 2px 8px 0 #0004;
+        }
+        .profile-name {
+            font-size: 1.35rem;
+            font-weight: 700;
+            margin-bottom: 0.15rem;
+            text-align: center;
+            letter-spacing: 0.01em;
+        }
+        .profile-username {
+            color: #8b949e;
+            font-size: 1rem;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            text-align: center;
+        }
+        .profile-role {
+            font-size: 0.98rem;
+            color: #b1bac4;
+            font-weight: 400;
+            text-align: center;
+            margin-bottom: 1.5rem;
+            font-style: italic;
+        }
+        .profile-stats-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            gap: 0.5rem;
+            margin-bottom: 1.2rem;
+        }
+        .profile-stat {
+            flex: 1 1 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-width: 60px;
+        }
+        .stat-count {
+            font-size: 1.15rem;
+            font-weight: 700;
+            margin-bottom: 0.1rem;
+        }
+        .stat-label {
+            font-size: 0.75rem;
+            color: #8b949e;
+            font-variant: small-caps;
+            font-weight: 400;
+            letter-spacing: 0.04em;
+            text-transform: lowercase;
+        }
+        .profile-stat-divider {
+            width: 1px;
+            height: 32px;
+            background: #22262e;
+            margin: 0 0.5rem;
+            border-radius: 2px;
+        }
+        .profile-divider {
+            width: 100%;
+            height: 1px;
+            background: #22262e;
+            margin: 1.2rem 0 1.5rem 0;
+            border-radius: 1px;
+        }
+        .profile-signout-btn {
+            width: 100%;
+            background: #6B46C1;
+            color: #fff;
+            border: none;
+            border-radius: 999px;
+            padding: 0.85rem 0;
+            font-size: 1rem;
+            font-weight: 600;
+            margin-top: auto;
+            box-shadow: 0 2px 8px 0 #2ea04322;
+            cursor: pointer;
+            transition: background 0.18s, box-shadow 0.18s, transform 0.12s;
+            outline: none;
+            margin-bottom: 0.25rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.6em;
+        }
+        .profile-signout-btn i {
+            font-size: 1.1em;
+        }
+        .profile-signout-btn:hover,
+        .profile-signout-btn:focus {
+            background: #4C1D95;
+            box-shadow: 0 4px 16px 0 #2ea04344;
+            transform: translateY(-2px) scale(1.02);
+        }
+        @media (max-width: 480px) {
+            .profile-modal {
+                width: 100vw;
+                border-radius: 0;
+                padding: 1.5rem 0.5rem 1rem 0.5rem;
+            }
+            .profile-avatar {
+                width: 64px;
+                height: 64px;
+            }
+            .profile-stats-row {
+                gap: 0.2rem;
+            }
+        }
+        /* Professional AI-Powered Search Bar Component */
+        .top-search-bar {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 32px auto;
+            max-width: 800px;
+            width: 100%;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+            border-radius: 16px;
+            overflow: hidden;
+            background: var(--card-bg);
+            transition: all 0.3s ease-in-out;
+        }
+
+        #main-search {
+            flex: 1;
+            width: 80%;
+            padding: 20px 24px;
+            border: 1px solid #30363d;
+            border-right: none;
+            border-radius: 16px 0 0 16px;
+            background: var(--input-bg);
+            color: #c9d1d9;
+            font-size: 18px;
+            font-weight: 500;
+            outline: none;
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+            transition: all 0.25s ease-in-out;
+        }
+
+        #main-search::placeholder {
+            color: #8b949e;
+            font-weight: 400;
+        }
+
+        #main-search:focus {
+            border-color: #8b5cf6;
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1), 0 0 0 3px rgba(139, 92, 246, 0.4);
+        }
+
+        .search-btn {
+            background: #8b5cf6;
+            color: #ffffff;
+            border: none;
+            border-radius: 0 16px 16px 0;
+            font-size: 18px;
+            font-weight: 700;
+            padding: 20px 28px;
+            cursor: pointer;
+            transition: all 0.25s ease-in-out;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .search-btn:hover {
+            background: #a78bfa;
+            transform: scale(1.03);
+        }
+
+        .search-btn:active {
+            transform: scale(0.98);
+        }
+
+        .search-btn:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.4);
+        }
+
+        /* Mobile Responsive Design */
+        @media (max-width: 500px) {
+            .top-search-bar {
+                flex-direction: column;
+                max-width: 100%;
+                margin: 24px 16px;
+            }
+
+            #main-search {
+                width: 100%;
+                border-radius: 16px 16px 0 0;
+                border-right: 1px solid #30363d;
+                border-bottom: none;
+            }
+
+            .search-btn {
+                width: 100%;
+                border-radius: 0 0 16px 16px;
+                padding: 22px 28px;
+            }
+        }
+        .file-type-dropdown {
+            background: var(--card-bg);
+            color: var(--text-primary);
+            border: 1.5px solid var(--border);
+            border-radius: 8px;
+            font-size: 16px;
+            padding: 10px 18px;
+            cursor: pointer;
+            transition: border 0.2s;
+        }
+        .file-type-dropdown:focus {
+            border: 1.5px solid var(--green);
+        }
+        /* AI Search Results */
+        .search-results {
+            margin: 0 auto;
+            max-width: 900px;
+            padding: 0 24px;
+        }
+        .search-results .search-loading {
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 18px;
+            margin: 48px 0;
+        }
+        .search-results .search-group {
+            margin-bottom: 32px;
+        }
+        .search-results .search-group-title {
+            color: var(--blue);
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+        .search-results .search-group-meta {
+            color: var(--text-secondary);
+            font-size: 15px;
+            margin-bottom: 16px;
+        }
+        .search-results .search-file-list {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+        .search-results .search-file-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #181c22;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            padding: 14px 18px;
+            color: var(--text-primary);
+            font-size: 16px;
+            transition: background 0.2s;
+        }
+        .search-results .search-file-row:hover {
+            background: #23272f;
+        }
+        .search-results .file-link {
+            color: var(--blue);
+            text-decoration: none;
+            font-weight: 500;
+            cursor: pointer;
+            transition: text-decoration 0.2s, color 0.2s;
+        }
+        .search-results .file-link:hover {
+            text-decoration: underline;
+            color: #7fd7ff;
+        }
+        .search-results .file-icon {
+            font-size: 18px;
+            margin-right: 12px;
+        }
+        .search-results .view-btn {
+            background: var(--green);
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 600;
+            padding: 8px 22px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .search-results .view-btn:hover, .search-results .view-btn:focus {
+            background: var(--green-hover);
+        }
+        .main-panel {
+            flex: 1;
+            padding: 24px;
+            overflow-y: auto;
+        }
+        .dashboard-home {
+            text-align: center;
+            padding: 38px 0;
+            
+        }
+        .branding {
+            margin-bottom: 40px;
+        }
+        .branding-icon {
+            font-size: 64px;
+            color: var(--green);
+            margin-bottom: 24px;
+        }
+        .dashboard-title {
+            font-size: 36px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 16px;
+        }
+        .dashboard-desc {
+            font-size: 18px;
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+        .feature-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        .feature-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 32px 24px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .feature-card:hover {
+            border-color: var(--green);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+        }
+        .feature-card i {
+            font-size: 48px;
+            color: var(--green);
+            margin-bottom: 16px;
+        }
+        .feature-card h2 {
+            font-size: 24px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 12px;
+        }
+        .feature-card p {
+            font-size: 16px;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        /* Code Editor Modal Styles */
+        .editor-modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(13, 17, 23, 0.95);
+            z-index: 3000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.2s;
+        }
+
+        .editor-modal {
+            background: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: 0 16px 64px #000a;
+            width: 95vw;
+            height: 90vh;
+            max-width: 1400px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .editor-modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 24px;
+            background: #1e1e1e;
+            border-bottom: 1px solid var(--border);
+            color: var(--text-primary);
+        }
+
+        .editor-modal-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .editor-repo-info {
+            font-size: 14px;
+            color: var(--text-secondary);
+            font-weight: 400;
+        }
+
+        .editor-modal-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .editor-save-btn, .editor-close-btn {
+            background: none;
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        .editor-save-btn:hover:not(:disabled) {
+            background: var(--green);
+            border-color: var(--green);
+            color: white;
+        }
+
+        .editor-save-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .editor-close-btn:hover {
+            background: #d73a49;
+            border-color: #d73a49;
+            color: white;
+        }
+
+        .editor-container {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .editor-sidebar {
+            width: 280px;
+            background: #252526;
+            border-right: 1px solid var(--border);
+            overflow-y: auto;
+        }
+
+        .editor-file-tree {
+            padding: 16px;
+        }
+
+        .editor-file-tree .file-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 12px;
+            border-radius: 4px;
+            color: var(--text-primary);
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.2s;
+        }
+
+        .editor-file-tree .file-item:hover {
+            background: #2a2d2e;
+        }
+
+        .editor-file-tree .file-item.active {
+            background: #094771;
+        }
+
+        .editor-file-tree .file-item i {
+            width: 16px;
+            text-align: center;
+            color: var(--text-secondary);
+        }
+
+        .editor-main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: #1e1e1e;
+        }
+
+        .editor-toolbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 16px;
+            background: #2d2d30;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .editor-tabs {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .editor-tab {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: #2d2d30;
+            border: 1px solid transparent;
+            border-bottom: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 14px;
+            border-radius: 4px 4px 0 0;
+            transition: all 0.2s;
+        }
+
+        .editor-tab.active {
+            background: #1e1e1e;
+            color: var(--text-primary);
+            border-color: var(--border);
+        }
+
+        .editor-tab .close-tab {
+            background: none;
+            border: none;
+            color: inherit;
+            cursor: pointer;
+            padding: 2px;
+            border-radius: 2px;
+            opacity: 0.7;
+        }
+
+        .editor-tab .close-tab:hover {
+            background: #d73a49;
+            color: white;
+            opacity: 1;
+        }
+
+        .editor-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .editor-commit-btn {
+            background: #6B46C1;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: background 0.2s;
+        }
+
+        .editor-commit-btn:hover:not(:disabled) {
+            background: var(--green-hover);
+        }
+
+        .editor-commit-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .editor-content {
+            flex: 1;
+            overflow: hidden;
+        }
+
+        #code-editor {
+            width: 100%;
+            height: 100%;
+            background: #1e1e1e;
+            color: #d4d4d4;
+            border: none;
+            outline: none;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            font-size: 14px;
+            line-height: 1.5;
+            padding: 16px;
+            resize: none;
+            tab-size: 4;
+        }
+
+        .editor-footer {
+            background: #2d2d30;
+            border-top: 1px solid var(--border);
+            padding: 16px 24px;
+        }
+
+        .commit-form {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        #commit-message {
+            flex: 1;
+            background: #3c3c3c;
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        #commit-message:focus {
+            border-color: var(--green);
+            outline: none;
+        }
+
+        .commit-submit-btn, .commit-cancel-btn {
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            border: none;
+            transition: background 0.2s;
+        }
+
+        .commit-submit-btn {
+            background: var(--green);
+            color: white;
+        }
+
+        .commit-submit-btn:hover {
+            background: var(--green-hover);
+        }
+
+        .commit-cancel-btn {
+            background: #6a737d;
+            color: white;
+        }
+
+        .commit-cancel-btn:hover {
+            background: #5a6268;
+        }
+
+        /* Syntax highlighting for common file types */
+        .editor-content[data-language="javascript"] #code-editor,
+        .editor-content[data-language="js"] #code-editor {
+            color: #d4d4d4;
+        }
+
+        .editor-content[data-language="html"] #code-editor {
+            color: #d4d4d4;
+        }
+
+        .editor-content[data-language="css"] #code-editor {
+            color: #d4d4d4;
+        }
+
+        .editor-content[data-language="json"] #code-editor {
+            color: #d4d4d4;
+        }
+
+        /* Loading state */
+        .editor-loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            color: var(--text-secondary);
+            font-size: 16px;
+        }
+
+        .editor-loading i {
+            margin-right: 8px;
+            animation: spin 1s linear infinite;
+        }
+
+        /* Image Viewer Styles */
+        .image-viewer {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            background: #1e1e1e;
+        }
+
+        .image-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 24px;
+            background: #2d2d30;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .image-filename {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .image-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .image-action-btn {
+            background: var(--green);
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: background 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .image-action-btn:hover {
+            background: var(--green-hover);
+        }
+
+        .image-container {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+            overflow: auto;
+            background: #1e1e1e;
+        }
+
+        .image-display {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            border-radius: 8px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .image-info {
+            padding: 16px 24px;
+            background: #2d2d30;
+            border-top: 1px solid var(--border);
+        }
+
+        .image-details {
+            display: flex;
+            gap: 24px;
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        .image-details span {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        /* Responsive image viewer */
+        @media (max-width: 768px) {
+            .image-header {
+                flex-direction: column;
+                gap: 12px;
+                align-items: flex-start;
+            }
+            
+            .image-actions {
+                width: 100%;
+                justify-content: flex-end;
+            }
+            
+            .image-details {
+                flex-direction: column;
+                gap: 8px;
+            }
+        }
+
+        /* Responsive Design - Media Queries */
+        
+        /* Large Desktop (1400px and up) */
+        @media (min-width: 1400px) {
+            .dashboard-container {
+                max-width: 1400px;
+                margin: 0 auto;
+            }
+            .repos-grid {
+                grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+            }
+            .popular-repos-grid {
+                grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            }
+        }
+
+        /* Desktop (1200px to 1399px) */
+        @media (max-width: 1399px) and (min-width: 1200px) {
+            .dashboard-container {
+                max-width: 1200px;
+                margin: 0 auto;
+            }
+            .repos-grid {
+                grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            }
+        }
+
+        /* Tablet Landscape (992px to 1199px) */
+        @media (max-width: 1199px) and (min-width: 992px) {
+            .dashboard-container {
+                max-width: 100%;
+                padding: 0 24px;
+            }
+            .repos-grid {
+                grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            }
+            .popular-repos-grid {
+                grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            }
+            .sidebar {
+                width: 280px;
+            }
+            .main-content {
+                margin-left: 280px;
+            }
+        }
+
+        /* Tablet Portrait (768px to 991px) */
+        @media (max-width: 991px) and (min-width: 768px) {
+            .dashboard-container {
+                padding: 0 20px;
+            }
+            .header {
+                padding: 12px 20px;
+            }
+            .sidebar {
+                width: 260px;
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+            }
+            .sidebar.open {
+                transform: translateX(0);
+            }
+            .main-content {
+                margin-left: 0;
+                width: 100%;
+            }
+            .mobile-menu-toggle {
+                display: block;
+            }
+            .repos-grid {
+                grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+                gap: 16px;
+            }
+            .popular-repos-grid {
+                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            }
+            .search-container {
+                flex-direction: column;
+                gap: 12px;
+            }
+            .search-container input {
+                width: 100%;
+            }
+            .search-container button {
+                width: 100%;
+            }
+        }
+
+        /* Mobile Large (576px to 767px) */
+        @media (max-width: 767px) and (min-width: 576px) {
+            .dashboard-container {
+                padding: 0 16px;
+            }
+            .header {
+                padding: 12px 16px;
+                flex-wrap: wrap;
+                gap: 12px;
+            }
+            .header-left {
+                flex: 1;
+                min-width: 0;
+            }
+            .logo-link {
+                font-size: 20px;
+            }
+            .header-right {
+                gap: 12px;
+            }
+            .sidebar {
+                width: 100%;
+                max-width: 320px;
+                transform: translateX(-100%);
+            }
+            .main-content {
+                margin-left: 0;
+                width: 100%;
+            }
+            .mobile-menu-toggle {
+                display: block;
+            }
+            .repos-grid {
+                grid-template-columns: 1fr;
+                gap: 16px;
+            }
+            .popular-repos-grid {
+                grid-template-columns: 1fr;
+            }
+            .search-container {
+                flex-direction: column;
+                gap: 12px;
+            }
+            .search-container input {
+                width: 100%;
+            }
+            .search-container button {
+                width: 100%;
+            }
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 16px;
+            }
+            .profile-modal {
+                width: 100%;
+                max-width: none;
+                border-radius: 0;
+            }
+        }
+
+        /* Mobile Small (up to 575px) */
+        @media (max-width: 575px) {
+            .dashboard-container {
+                padding: 0 12px;
+            }
+            .header {
+                padding: 12px;
+                flex-direction: column;
+                gap: 12px;
+                align-items: stretch;
+            }
+            .header-left {
+                justify-content: center;
+            }
+            .header-right {
+                justify-content: center;
+                gap: 16px;
+            }
+            .logo-link {
+                font-size: 18px;
+            }
+            .sidebar {
+                width: 100%;
+                transform: translateX(-100%);
+            }
+            .main-content {
+                margin-left: 0;
+                width: 100%;
+                padding: 16px 0;
+            }
+            .mobile-menu-toggle {
+                display: block;
+            }
+            .repos-grid {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+            .popular-repos-grid {
+                grid-template-columns: 1fr;
+            }
+            .search-container {
+                flex-direction: column;
+                gap: 12px;
+            }
+            .search-container input {
+                width: 100%;
+                font-size: 16px; /* Prevents zoom on iOS */
+            }
+            .search-container button {
+                width: 100%;
+            }
+            .stats-grid {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+            .profile-modal {
+                width: 100%;
+                max-width: none;
+                border-radius: 0;
+                padding: 1.5rem 1rem;
+            }
+            .profile-modal-overlay {
+                justify-content: center;
+            }
+            .repo-card {
+                padding: 16px;
+            }
+            .repo-card h3 {
+                font-size: 16px;
+            }
+            .repo-meta {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+            }
+        }
+
+        /* Extra Small Mobile (up to 375px) */
+        @media (max-width: 375px) {
+            .dashboard-container {
+                padding: 0 8px;
+            }
+            .header {
+                padding: 8px;
+            }
+            .main-content {
+                padding: 12px 0;
+            }
+            .repos-grid {
+                gap: 8px;
+            }
+            .repo-card {
+                padding: 12px;
+            }
+            .stats-grid {
+                gap: 8px;
+            }
+            .profile-modal {
+                padding: 1rem 0.75rem;
+            }
+        }
+
+        /* Landscape Mobile */
+        @media (max-height: 500px) and (orientation: landscape) {
+            .header {
+                padding: 8px 16px;
+            }
+            .main-content {
+                padding: 12px 0;
+            }
+            .profile-modal {
+                height: 100vh;
+                overflow-y: auto;
+            }
+        }
+
+        /* High DPI Displays */
+        @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+            .avatar-btn img {
+                image-rendering: -webkit-optimize-contrast;
+                image-rendering: crisp-edges;
+            }
+        }
+
+        /* Print Styles */
+        @media print {
+            .header,
+            .sidebar,
+            .mobile-menu-toggle,
+            .search-container,
+            .profile-modal-overlay {
+                display: none !important;
+            }
+            .main-content {
+                margin-left: 0 !important;
+                width: 100% !important;
+            }
+            .dashboard-container {
+                padding: 0 !important;
+            }
+        }
+
+        /* Mobile-specific touch improvements */
+        @media (hover: none) and (pointer: coarse) {
+            /* Increase touch targets on touch devices */
+            .avatar-btn, .mobile-menu-toggle, .theme-toggle, button {
+                min-height: 44px;
+                min-width: 44px;
+            }
+            
+            /* Improve touch scrolling */
+            .sidebar, .main-content, .modal-content {
+                -webkit-overflow-scrolling: touch;
+                overflow-scrolling: touch;
+            }
+            
+            /* Better touch feedback */
+            .repo-card, .feature-card, button {
+                transition: transform 0.1s ease, background-color 0.1s ease;
+            }
+            
+            .repo-card:active, .feature-card:active, button:active {
+                transform: scale(0.98);
+            }
+        }
+
+        /* iOS Safari specific fixes */
+        @supports (-webkit-touch-callout: none) {
+            body {
+                /* Fix for iOS Safari 100vh issue */
+                height: -webkit-fill-available;
+            }
+            
+            .profile-modal {
+                /* Fix modal height on iOS */
+                height: -webkit-fill-available;
+            }
+        }
+
+        /* Android Chrome specific fixes */
+        @supports (-webkit-appearance: none) and (not (-webkit-touch-callout: none)) {
+            input, textarea {
+                /* Fix input zoom on Android */
+                font-size: 16px;
+            }
+        }
+
+        /* Accessibility - Reduced Motion */
+        @media (prefers-reduced-motion: reduce) {
+            *,
+            *::before,
+            *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+
+        /* Dark Mode Support */
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg: #0d1117;
+                --card-bg: #161b22;
+                --border: #30363d;
+                --text-primary: #c9d1d9;
+                --text-secondary: #8b949e;
+            }
+        }
+
+        @media (prefers-color-scheme: light) {
+            :root {
+                --bg: #ffffff;
+                --card-bg: #f6f8fa;
+                --border: #d0d7de;
+                --text-primary: #24292f;
+                --text-secondary: #57606a;
+            }
+        }
+    </style>
+    <script>
+        const savedTheme = localStorage.getItem('theme') || 'dark';
+        document.documentElement.className = savedTheme + '-mode';
+    </script>
+</head>
+
+<body>
+    <div id="loader" class="loader-overlay">
+        <div class="spinner"></div>
+    </div>
+    <header class="header">
+        <div class="header-left">
+            <a href="/dashboard.html" class="logo-link">
+                <!-- <span class="logo-icon"><i class="fa-regular fa-square"></i></span> -->
+                <!-- <i class="fa-brands fa-github branding-icon"></i> -->
+                <span class="logo-text">LUMIX</span>
+            </a>
+        </div>
+        <div class="header-right">
+            <button id="mobile-menu-toggle" class="mobile-menu-toggle" aria-label="Toggle menu">
+                <i class="fa-solid fa-bars"></i>
+            </button>
+            <button id="profile-btn" class="avatar-btn" aria-label="Profile">
+                <img id="profile-avatar" class="avatar-img" src="" alt="Profile" />
+            </button>
+        </div>
+    </header>
+    <div class="dashboard-layout">
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <span class="sidebar-title"><i class="fa-regular fa-folder-open"></i> Repositories</span>
+            </div>
+            <div class="sidebar-search">
+                <input type="search" id="repo-search" placeholder="Search repositories..." />
+            </div>
+            <ul id="repo-list" class="repo-list"></ul>
+        </aside>
+        <main class="main-panel">
+            <div class="top-search-bar">
+                <input type="search" id="main-search" placeholder="Search for files, code, images…" />
+                <button id="main-search-btn" class="search-btn">AI Search</button>
+            </div>
+            <section id="dashboard-home" class="dashboard-home">
+                <div class="branding">
+                    <i class="fa-brands fa-github branding-icon"></i>
+                    <h1 class="dashboard-title">AI-Powered GitHub Explorer</h1>
+                    <p class="dashboard-desc">Search for images, code files, and any content across your repositories. Edit code directly and sync changes back to GitHub seamlessly.</p>
+                </div>
+                <div class="feature-cards">
+                    <div class="feature-card" id="find-images-card" onclick="handleFeatureCardClick('images')">
+                        <i class="fa-regular fa-image"></i>
+                        <h2>Find Images</h2>
+                        <p>Search and preview images across repositories</p>
+                    </div>
+                    <div class="feature-card" id="edit-code-card" onclick="handleFeatureCardClick('code')">
+                        <i class="fa-solid fa-code"></i>
+                        <h2>Edit Code</h2>
+                        <p>Edit files directly and push to GitHub</p>
+                    </div>
+                    <div class="feature-card" id="ai-integration-card" onclick="handleFeatureCardClick('ai')">
+                        <i class="fa-solid fa-brain"></i>
+                        <h2>AI Integration</h2>
+                        <p>Smart search with AI-powered insights</p>
+                    </div>
+                </div>
+            </section>
+            <section id="search-results" class="search-results" style="display:none;"></section>
+        </main>
+    </div>
+    <!-- Profile Modal, Repo Modal, File Modal will be added in next steps -->
+    <div id="contrib-tooltip" class="contrib-tooltip"></div>
+    <!-- Repo File Explorer Modal -->
+    <div id="repo-modal-overlay" class="modal-overlay" style="display:none;">
+        <div class="modal" role="dialog" aria-modal="true" aria-labelledby="repo-modal-title">
+            <div class="modal-header">
+                <span id="repo-modal-title"></span>
+                <button class="modal-close" id="repo-modal-close" aria-label="Close"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="modal-file-list" id="repo-modal-file-list"></div>
+        </div>
+    </div>
+    <!-- Profile Modal -->
+    <div id="profile-modal-overlay" class="profile-modal-overlay">
+        <div class="profile-modal" role="dialog" aria-modal="true" aria-labelledby="profile-modal-title">
+            <div class="profile-modal-header">
+                <span id="profile-modal-title"></span>
+            </div>
+            <div class="profile-modal-content" id="profile-modal-content"></div>
+        </div>
+    </div>
+
+    <!-- Code Editor Modal -->
+    <div id="editor-modal-overlay" class="editor-modal-overlay" style="display:none;">
+        <div class="editor-modal" role="dialog" aria-modal="true">
+            <div class="editor-modal-header">
+                <div class="editor-modal-title">
+                    <span id="editor-filename"></span>
+                    <span class="editor-repo-info" id="editor-repo-info"></span>
+                </div>
+                <div class="editor-modal-actions">
+                    <button class="editor-save-btn" id="editor-save-btn" disabled>
+                        <i class="fa-solid fa-save"></i> Save
+                    </button>
+                    <button class="editor-close-btn" id="editor-close-btn">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="editor-container">
+                <div class="editor-sidebar">
+                    <div class="editor-file-tree" id="editor-file-tree"></div>
+                </div>
+                <div class="editor-main">
+                    <div class="editor-toolbar">
+                        <div class="editor-tabs" id="editor-tabs"></div>
+                        <div class="editor-actions">
+                            <button class="editor-commit-btn" id="editor-commit-btn" disabled>
+                                <i class="fa-solid fa-code-commit"></i> Commit Changes
+                            </button>
+                        </div>
+                    </div>
+                    <div class="editor-content">
+                        <textarea id="code-editor" spellcheck="false"></textarea>
+                    </div>
+                </div>
+            </div>
+            <div class="editor-footer" id="editor-footer" style="display:none;">
+                <div class="commit-form">
+                    <input type="text" id="commit-message" placeholder="Enter commit message..." />
+                    <button id="commit-submit-btn" class="commit-submit-btn">
+                        <i class="fa-solid fa-check"></i> Commit
+                    </button>
+                    <button id="commit-cancel-btn" class="commit-cancel-btn">
+                        <i class="fa-solid fa-times"></i> Cancel
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let allUserRepos = [];
+        let currentRepoList = [];
+        let currentPage = 1;
+        const reposPerPage = 10;
+
+        // --- THEME LOGIC ---
+        const applyTheme = (theme) => {
+            document.documentElement.className = theme + '-mode';
+            localStorage.setItem('theme', theme);
+        };
+        const toggleTheme = () => applyTheme(localStorage.getItem('theme') === 'dark' ? 'light' : 'dark');
+
+        // --- RENDERING FUNCTIONS ---
+        function renderProfile(user) {
+            const sidebar = document.getElementById('profile-sidebar');
+            sidebar.innerHTML = `
+            <img src="${user.avatar_url}" alt="Avatar" class="profile-avatar">
+            <h1 class="profile-name">${user.name || ''}</h1>
+            <h2 class="profile-login">${user.login}</h2>
+            <ul class="profile-details">
+                <li><i class="fa-solid fa-users"></i><strong>${user.followers}</strong> followers · <strong>${user.following}</strong> following</li>
+                ${user.location ? `<li><i class="fa-solid fa-location-dot"></i> ${user.location}</li>` : ''}
+                ${user.twitter_username ? `<li><i class="fa-brands fa-twitter"></i> @${user.twitter_username}</li>` : ''}
+            </ul>`;
+        }
+
+        function renderPopularRepos(repos) {
+            const container = document.getElementById('popular-repos-grid');
+            const popular = repos.sort((a, b) => b.stargazers_count - a.stargazers_count).slice(0, 6);
+            container.innerHTML = popular.map(repo => `
+            <div class="repo-grid-item">
+                <h3><a href="/repo.html?owner=${repo.owner.login}&repo=${repo.name}">${repo.name}</a></h3>
+                <div class="repo-meta">${repo.language ? `<span><span class="language-dot" style="background-color:${getLanguageColor(repo.language)}"></span> ${repo.language}</span>` : ''}</div>
+            </div>`).join('');
+        }
+
+        function renderContributionGraph(data) {
+            const container = document.getElementById('contribution-graph-wrapper');
+            const CELL_SIZE = 15, CELL_GAP = 3, WEEK_WIDTH = CELL_SIZE + CELL_GAP;
+            const chartWidth = (data.weeks.length + 2) * WEEK_WIDTH;
+            let monthHtml = '';
+            let currentMonthX = WEEK_WIDTH;
+            data.months.forEach(month => {
+                monthHtml += `<text x="${currentMonthX}" y="-8" class="months">${month.name}</text>`;
+                currentMonthX += month.totalWeeks * WEEK_WIDTH;
+            });
+            const calendarHtml = data.weeks.map((week, weekIndex) => week.contributionDays.map(day => `<rect class="contrib-cell" width="${CELL_SIZE}" height="${CELL_SIZE}" x="${(weekIndex + 1) * WEEK_WIDTH}" y="${day.weekday * WEEK_WIDTH}" data-level="${day.contributionCount > 0 ? (Math.min(4, Math.ceil(day.contributionCount / 5))) : 0}" data-count="${day.contributionCount}" data-date="${day.date}"></rect>`).join('')).join('');
+            container.innerHTML = `<div class="contrib-header"><h2>${data.totalContributions} contributions in the last year</h2></div><svg width="${chartWidth}" height="120" class="contrib-calendar"><g transform="translate(10, 20)">${monthHtml}<g transform="translate(-12, 0)"><text x="0" y="10" class="wday">Mon</text><text x="0" y="40" class="wday">Wed</text><text x="0" y="70" class="wday">Fri</text></g>${calendarHtml}</g></svg>`;
+            const tooltip = document.getElementById('contrib-tooltip');
+            document.querySelectorAll('.contrib-cell').forEach(cell => {
+                cell.addEventListener('mouseenter', e => {
+                    const count = e.target.dataset.count;
+                    const date = new Date(e.target.dataset.date).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+                    tooltip.innerHTML = `<strong>${count} contributions</strong> on ${date}`;
+                    tooltip.style.opacity = '1';
+                });
+                cell.addEventListener('mouseleave', () => { tooltip.style.opacity = '0'; });
+                cell.addEventListener('mousemove', e => { tooltip.style.left = `${e.pageX + 15}px`; tooltip.style.top = `${e.pageY - 30}px`; });
+            });
+        }
+
+        const getLanguageColor = (lang) => { const c = { "JavaScript": "#f1e05a", "Python": "#3572A5", "HTML": "#e34c26", "CSS": "#563d7c", "C++": "#f34b7d" }; return c[lang] || '#cccccc'; };
+
+        // --- PAGINATION & LIST RENDERING ---
+        const renderPaginationControls = () => { const t = Math.ceil(currentRepoList.length / reposPerPage); document.getElementById('page-info').textContent = `Page ${currentPage} of ${t || 1}`; document.getElementById('prev-page-btn').disabled = currentPage === 1; document.getElementById('next-page-btn').disabled = currentPage === t || t === 0; };
+        const renderCurrentPage = () => { const l = document.getElementById('repo-list'), p = document.getElementById('pagination-controls'); l.innerHTML = ''; if (!currentRepoList.length) { l.innerHTML = '<li class="repo-list-item"><p>No results found.</p></li>'; p.style.display = 'none'; return; } p.style.display = 'flex'; const i = currentRepoList.slice((currentPage - 1) * reposPerPage, currentPage * reposPerPage); l.innerHTML = i.map(item => { const d = item.data, r = d.repo || d; const f = `/repo.html?owner=${r.owner.login}&repo=${r.name}${item.type === 'file' ? `&file=${d.path}` : ''}`; return `<li class="repo-list-item"><h3><a href="${f}">${item.type === 'file' ? `<i class="fa-solid fa-file-code"></i> ` : ''}${d.name}</a></h3><p>${item.type === 'file' ? `In <strong>${r.name}</strong>` : d.description || 'No description'}</p></li>` }).join(''); renderPaginationControls(); };
+        const displayRepoList = (results) => { currentRepoList = results; currentPage = 1; renderCurrentPage(); };
+
+        // --- AI SEARCH LOGIC ---
+        function renderAiResults(results) {
+            const resultsContainer = document.getElementById('ai-results-container');
+            const list = document.getElementById('ai-repo-list');
+            const originalContent = document.getElementById('original-overview-content');
+            list.innerHTML = ''; // Clear previous results
+            if (!results || results.length === 0) {
+                list.innerHTML = '<li class="repo-list-item"><p>No results found.</p></li>';
+            } else {
+                list.innerHTML = results.map(item => {
+                    const d = item.data;
+                    const r = d.repo || d;
+                    const fileParam = item.type === 'file' ? `&file=${encodeURIComponent(d.path)}` : '';
+                    const link = `/repo.html?owner=${r.owner.login}&repo=${r.name}${fileParam}`;
+                    const icon = item.type === 'file' ? '<i class="fa-solid fa-file-code"></i>' : '<i class="fa-solid fa-book"></i>';
+                    const description = item.type === 'file' ? `In <strong>${r.name}</strong>` : (d.description || 'No description');
+                    return `<li class="repo-list-item"><h3><a href="${link}">${icon} ${d.name}</a></h3><p>${description}</p></li>`;
+                }).join('');
+            }
+            resultsContainer.style.display = 'block';
+            originalContent.style.display = 'none';
+        }
+        const handleAiSearch = async () => {
+            const queryInput = document.getElementById('ai-search');
+            const q = queryInput.value.trim();
+            const resultsContainer = document.getElementById('ai-results-container');
+            const list = document.getElementById('ai-repo-list');
+            const originalContent = document.getElementById('original-overview-content');
+            if (!q) {
+                resultsContainer.style.display = 'none';
+                originalContent.style.display = 'block';
+                list.innerHTML = '';
+                return;
+            }
+            list.innerHTML = '<li class="repo-list-item"><p>Searching...</p></li>';
+            resultsContainer.style.display = 'block';
+            originalContent.style.display = 'none';
+            try {
+                const r = await fetch('/api/ai-search', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ query: q }) });
+                if (!r.ok) throw new Error();
+                const d = await r.json();
+                renderAiResults(d.results);
+            } catch (e) { list.innerHTML = `<li class="repo-list-item"><p>AI Search failed. Please try again.</p></li>`; }
+        };
+
+        // Sidebar repo list logic
+        let pinnedRepos = JSON.parse(localStorage.getItem('pinnedRepos') || '[]');
+        function renderSidebarRepoList(repos) {
+            const list = document.getElementById('repo-list');
+            list.innerHTML = '';
+
+            // Get pinned repo names in order
+            const pinned = pinnedRepos.map(name => repos.find(r => r.data.name === name)).filter(Boolean);
+            // Get unpinned repos
+            const unpinned = repos.filter(r => !pinnedRepos.includes(r.data.name));
+
+            // Optionally, sort unpinned alphabetically:
+            unpinned.sort((a, b) => a.data.name.localeCompare(b.data.name));
+
+            // Combine pinned and unpinned
+            const sortedRepos = [...pinned, ...unpinned];
+
+            sortedRepos.forEach(repo => {
+                const isPinned = pinnedRepos.includes(repo.data.name);
+                const li = document.createElement('li');
+                li.className = 'repo-list-item';
+                li.tabIndex = 0;
+                li.innerHTML = `
+                    <div class="repo-header">
+                        <a class="repo-name" href="#" data-repo="${repo.data.name}">${repo.data.name}</a>
+                        <div class="repo-actions">
+                            <button class="star-btn${isPinned ? ' pinned' : ''}" title="Pin/Unpin">
+                                <i class="fa${isPinned ? 's' : 'r'} fa-star"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="repo-meta">
+                        <span class="repo-lang"><span class="repo-lang-dot" style="background:${getLanguageColor(repo.data.language)}"></span> ${repo.data.language || 'Other'}</span>
+                        ${repo.data.private ? '<span class="repo-private">Private</span>' : ''}
+                    </div>
+                `;
+                // Pin/unpin logic
+                li.querySelector('.star-btn').onclick = (e) => {
+                    e.stopPropagation();
+                    const idx = pinnedRepos.indexOf(repo.data.name);
+                    if (idx === -1) pinnedRepos.push(repo.data.name);
+                    else pinnedRepos.splice(idx, 1);
+                    localStorage.setItem('pinnedRepos', JSON.stringify(pinnedRepos));
+                    renderSidebarRepoList(repos);
+                };
+                // Open repo modal on name click
+                li.querySelector('.repo-name').onclick = (e) => {
+                    e.preventDefault();
+                    openEditorModal(repo.data);
+                };
+                list.appendChild(li);
+            });
+        }
+        // Real-time filter
+        document.getElementById('repo-search').addEventListener('input', e => {
+            const q = e.target.value.toLowerCase();
+            renderSidebarRepoList(allUserRepos.filter(r => r.data.name.toLowerCase().includes(q)));
+        });
+        // On load, render sidebar repo list
+        window.addEventListener('DOMContentLoaded', () => {
+            renderSidebarRepoList(allUserRepos);
+        });
+
+        // --- INITIALIZATION ---
+        window.onload = async () => {
+            try {
+                const [userDataRes, contribDataRes] = await Promise.all([fetch('/api/user-data'), fetch('/api/contribution-data')]);
+                
+                // Check if authentication failed
+                if (userDataRes.status === 401) {
+                    console.log("Authentication failed, redirecting to login");
+                    window.location.href = '/index.html';
+                    return;
+                }
+                
+                if (!userDataRes.ok || !contribDataRes.ok) { 
+                    console.error("API request failed:", userDataRes.status, contribDataRes.status);
+                    throw new Error(`API request failed: ${userDataRes.status} ${contribDataRes.status}`);
+                }
+
+                const { userData, reposData } = await userDataRes.json();
+                const contribData = await contribDataRes.json();
+                allUserRepos = reposData.map(r => ({ type: 'repo', data: r }));
+
+                // Store user data globally for profile modal
+                window.userData = userData;
+
+                // Render sidebar repo list
+                renderSidebarRepoList(allUserRepos);
+                
+                // Set profile avatar
+                setProfileAvatar(userData);
+
+                document.getElementById('loader').style.display = 'none';
+                document.querySelector('.dashboard-layout').style.visibility = 'visible';
+
+                // Add event listeners
+                document.getElementById('profile-btn').addEventListener('click', () => {
+                    openProfileModal(userData, allUserRepos.map(r => r.data));
+                });
+
+                // Mobile menu toggle
+                document.getElementById('mobile-menu-toggle').addEventListener('click', () => {
+                    const sidebar = document.getElementById('sidebar');
+                    sidebar.classList.toggle('open');
+                });
+
+                // Close mobile menu when clicking outside
+                document.addEventListener('click', (e) => {
+                    const sidebar = document.getElementById('sidebar');
+                    const mobileToggle = document.getElementById('mobile-menu-toggle');
+                    
+                    if (sidebar.classList.contains('open') && 
+                        !sidebar.contains(e.target) && 
+                        !mobileToggle.contains(e.target)) {
+                        sidebar.classList.remove('open');
+                    }
+                });
+
+            } catch (error) {
+                console.error("Error loading dashboard:", error);
+                if (error.message.includes('401') || error.message.includes('Authentication')) {
+                    window.location.href = '/index.html';
+                } else {
+                    document.getElementById('loader').innerHTML = `<p>Error loading page. Please try again.</p>`;
+                }
+            }
+        };
+
+        // --- Repo Modal Logic ---
+        let currentRepoFiles = [];
+        function openRepoModal(repo) {
+            document.getElementById('repo-modal-title').textContent = `${repo.owner.login} / ${repo.name}`;
+            const fileList = document.getElementById('repo-modal-file-list');
+            fileList.innerHTML = '<div style="padding:32px;text-align:center;color:var(--text-secondary);">Loading...</div>';
+            document.getElementById('repo-modal-overlay').style.display = 'flex';
+            // Fetch repo files (simulate for now)
+            fetch(`/api/repo-contents?owner=${repo.owner.login}&repo=${repo.name}`)
+                .then(r => r.json())
+                .then(files => {
+                    currentRepoFiles = files;
+                    fileList.innerHTML = files.map(f => `
+                        <div class="modal-file-row">
+                            <span><i class="fa-regular fa-file file-icon"></i> <a class="file-link" href="#" data-path="${f.path}">${f.name}</a></span>
+                            <span style="color:var(--text-secondary);font-size:14px;">${f.name}</span>
+                        </div>
+                    `).join('');
+                    // Add click listeners
+                    fileList.querySelectorAll('.file-link').forEach(link => {
+                        link.onclick = (e) => {
+                            e.preventDefault();
+                            // TODO: Open code editor modal for file
+                            alert('Open code editor for ' + link.dataset.path);
+                        };
+                    });
+                });
+        }
+        document.getElementById('repo-modal-close').onclick = () => {
+            document.getElementById('repo-modal-overlay').style.display = 'none';
+        };
+        document.getElementById('repo-modal-overlay').addEventListener('click', (e) => {
+            if (e.target === document.getElementById('repo-modal-overlay')) {
+                document.getElementById('repo-modal-overlay').style.display = 'none';
+            }
+        });
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                document.getElementById('repo-modal-overlay').style.display = 'none';
+            }
+        });
+        // Hook up sidebar repo name click to open modal
+        function hookSidebarRepoClicks() {
+            document.querySelectorAll('.repo-name').forEach(link => {
+                link.onclick = (e) => {
+                    e.preventDefault();
+                    const repoName = link.dataset.repo;
+                    const repo = allUserRepos.find(r => r.data.name === repoName).data;
+                    openEditorModal(repo);
+                };
+            });
+        }
+        // Re-hook after rendering sidebar
+        const origRenderSidebarRepoList = renderSidebarRepoList;
+        renderSidebarRepoList = function(repos) {
+            origRenderSidebarRepoList(repos);
+            hookSidebarRepoClicks();
+        };
+
+        // --- Profile Modal Logic ---
+        function openProfileModal(user, repos) {
+            document.getElementById('profile-modal-title').textContent = '';
+            const contentDiv = document.getElementById('profile-modal-content');
+            contentDiv.innerHTML = `
+                <div class="profile-avatar-container">
+                    <img src="${user.avatar_url}" class="profile-avatar" alt="Avatar" />
+                </div>
+                <div class="profile-name">${user.name || ''}</div>
+                <div class="profile-username">@${user.login}</div>
+                <div class="profile-role">Full Stack Developer Enthusiast</div>
+                <div class="profile-stats-row">
+                    <div class="profile-stat">
+                        <div class="stat-count">${repos.length}</div>
+                        <div class="stat-label">Repositories</div>
+                    </div>
+                    <div class="profile-stat-divider"></div>
+                    <div class="profile-stat">
+                        <div class="stat-count">${user.followers}</div>
+                        <div class="stat-label">Followers</div>
+                    </div>
+                    <div class="profile-stat-divider"></div>
+                    <div class="profile-stat">
+                        <div class="stat-count">${user.following}</div>
+                        <div class="stat-label">Following</div>
+                    </div>
+                </div>
+                <div class="profile-divider"></div>
+                <button class="profile-signout-btn" id="profile-modal-signout">
+                    <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                    <span>Sign out</span>
+                </button>
+            `;
+            const overlay = document.getElementById('profile-modal-overlay');
+            overlay.classList.add('show');
+        }
+        document.getElementById('profile-btn').onclick = () => {
+            // Use loaded userData and allUserRepos
+            openProfileModal(window.userData, window.allUserRepos.map(r => r.data));
+        };
+
+        document.getElementById('profile-modal-overlay').addEventListener('click', (e) => {
+            if (e.target === document.getElementById('profile-modal-overlay')) {
+                document.getElementById('profile-modal-overlay').classList.remove('show');
+            }
+        });
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                document.getElementById('profile-modal-overlay').classList.remove('show');
+            }
+        });
+
+        // On user data load, set avatar
+        function setProfileAvatar(user) {
+            document.getElementById('profile-avatar').src = user.avatar_url;
+        }
+        // Patch userData load in window.onload
+        const origWindowOnload = window.onload;
+        window.onload = async () => {
+            await origWindowOnload();
+            window.userData = window.userData || (await fetch('/api/user-data').then(r => r.json()).then(d => d.userData));
+            setProfileAvatar(window.userData);
+        };
+
+        // --- AI Search Logic (Top Search Bar) ---
+        function renderSearchResults(results) {
+            const resultsSection = document.getElementById('search-results');
+            if (!results || results.length === 0) {
+                resultsSection.innerHTML = '<div class="search-loading">No results found.</div>';
+                resultsSection.style.display = 'block';
+                return;
+            }
+            // Group by repo
+            const grouped = {};
+            results.forEach(item => {
+                const repo = item.data.repo ? item.data.repo.name : item.data.name;
+                if (!grouped[repo]) grouped[repo] = [];
+                grouped[repo].push(item);
+            });
+            resultsSection.innerHTML = Object.entries(grouped).map(([repo, items]) => `
+                <div class="search-group">
+                    <div class="search-group-title">${repo}</div>
+                    <div class="search-group-meta">${items.length} file${items.length > 1 ? 's' : ''}</div>
+                    <ul class="search-file-list">
+                        ${items.map(item => {
+                            const d = item.data;
+                            const fileParam = item.type === 'file' ? `&file=${encodeURIComponent(d.path)}` : '';
+                            const icon = item.type === 'file' ? '<i class="fa-regular fa-file file-icon"></i>' : '<i class="fa-solid fa-book file-icon"></i>';
+                            return `<li class="search-file-row">
+                                <span>${icon} <a class="file-link" href="#" data-repo="${d.repo ? d.repo.name : d.name}" data-path="${d.path || ''}">${d.name}</a></span>
+                                <button class="view-btn" data-repo="${d.repo ? d.repo.name : d.name}" data-path="${d.path || ''}">View</button>
+                            </li>`;
+                        }).join('')}
+                    </ul>
+                </div>
+            `).join('');
+            resultsSection.style.display = 'block';
+            // Hook up view buttons and file links
+            resultsSection.querySelectorAll('.view-btn, .file-link').forEach(btn => {
+                btn.onclick = (e) => {
+                    e.preventDefault();
+                    const repoName = btn.dataset.repo;
+                    const filePath = btn.dataset.path;
+                    const repo = allUserRepos.find(r => r.data.name === repoName).data;
+                    window.currentRepo = repo;
+                    window.currentFilePath = filePath;
+                    window.currentFileName = btn.textContent.trim();
+                    openEditorModal(repo, filePath, window.currentFileName);
+                };
+            });
+        }
+        function handleMainSearch() {
+            let q = document.getElementById('main-search').value.trim();
+            if (!q) {
+                // If search is empty, show dashboard home and hide search results
+                document.getElementById('dashboard-home').style.display = 'block';
+                document.getElementById('search-results').style.display = 'none';
+                return;
+            }
+            const resultsSection = document.getElementById('search-results');
+            resultsSection.innerHTML = '<div class="search-loading"><i class="fa-solid fa-spinner fa-spin"></i> Searching all repositories...</div>';
+            resultsSection.style.display = 'block';
+            // Hide the dashboard home when searching
+            document.getElementById('dashboard-home').style.display = 'none';
+            fetch('/api/ai-search', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ query: q })
+            })
+                .then(r => r.json())
+                .then(d => renderSearchResults(d.results))
+                .catch(() => {
+                    resultsSection.innerHTML = '<div class="search-loading">AI Search failed. Please try again.</div>';
+                });
+        }
+        document.getElementById('main-search-btn').onclick = handleMainSearch;
+        document.getElementById('main-search').addEventListener('keyup', e => { 
+            if (e.key === 'Enter') {
+                handleMainSearch();
+            } else if (e.target.value.trim() === '') {
+                // If search field is cleared, show dashboard home and hide search results
+                document.getElementById('dashboard-home').style.display = 'block';
+                document.getElementById('search-results').style.display = 'none';
+            }
+        });
+
+        // --- Code Editor Modal Logic ---
+        let openTabs = [];
+        let currentTabIndex = -1;
+        let currentRepo = null;
+        let currentFileTree = [];
+        let fileContents = {};
+        let fileShas = {};
+        let hasUnsavedChanges = false;
+
+        function openEditorModal(repo, filePath = null, fileName = null) {
+            currentRepo = repo;
+            openTabs = [];
+            currentTabIndex = -1;
+            fileContents = {};
+            fileShas = {};
+            hasUnsavedChanges = false;
+
+            // Set modal title
+            document.getElementById('editor-filename').textContent = fileName || 'Code Editor';
+            document.getElementById('editor-repo-info').textContent = `${repo.owner.login}/${repo.name}`;
+
+            // Show modal
+            document.getElementById('editor-modal-overlay').style.display = 'flex';
+            document.getElementById('dashboard-home').style.display = 'none';
+            document.getElementById('search-results').style.display = 'none';
+
+            // Load file tree
+            loadEditorFileTree();
+
+            // If a specific file was requested, open it
+            if (filePath) {
+                openFileInEditor(filePath);
+            }
+        }
+
+        async function loadEditorFileTree() {
+            const fileTreeContainer = document.getElementById('editor-file-tree');
+            fileTreeContainer.innerHTML = '<div class="editor-loading"><i class="fa-solid fa-spinner"></i> Loading files...</div>';
+
+            try {
+                const response = await fetch(`/api/repo-tree?owner=${currentRepo.owner.login}&repo=${currentRepo.name}`);
+                if (!response.ok) throw new Error('Failed to load repository tree');
+                
+                const data = await response.json();
+                currentFileTree = data.tree.filter(item => item.type === 'blob');
+                
+                if (currentFileTree.length === 0) {
+                    fileTreeContainer.innerHTML = '<div class="editor-loading">No files found in this repository</div>';
+                } else {
+                    renderEditorFileTree();
+                }
+            } catch (error) {
+                fileTreeContainer.innerHTML = '<div class="editor-loading">Error loading files</div>';
+                console.error('Error loading file tree:', error);
+            }
+        }
+
+        function renderEditorFileTree() {
+            const fileTreeContainer = document.getElementById('editor-file-tree');
+            
+            // Group files by directory
+            const fileGroups = {};
+            const dirGroups = {};
+            
+            currentFileTree.forEach(file => {
+                const pathParts = file.path.split('/');
+                const fileName = pathParts.pop();
+                const dirPath = pathParts.join('/');
+                
+                if (dirPath) {
+                    // Add directory to dirGroups
+                    if (!dirGroups[dirPath]) {
+                        dirGroups[dirPath] = [];
+                    }
+                    dirGroups[dirPath].push({ ...file, fileName });
+                } else {
+                    // Root level files
+                    if (!fileGroups['root']) {
+                        fileGroups['root'] = [];
+                    }
+                    fileGroups['root'].push({ ...file, fileName });
+                }
+            });
+
+            let html = '';
+            
+            // Render root level files first
+            if (fileGroups['root']) {
+                fileGroups['root'].sort((a, b) => a.fileName.localeCompare(b.fileName)).forEach(file => {
+                    const icon = getFileIcon(file.fileName);
+                    html += `<div class="file-item" data-path="${file.path}" onclick="openFileInEditor('${file.path}')">
+                        <i class="${icon}"></i> ${file.fileName}
+                    </div>`;
+                });
+            }
+            
+            // Render directories and their files
+            Object.keys(dirGroups).sort().forEach(dir => {
+                html += `<div class="file-item" style="font-weight: 600; color: var(--accent); margin-top: 8px;">
+                    <i class="fa-solid fa-folder"></i> ${dir}
+                </div>`;
+                
+                dirGroups[dir].sort((a, b) => a.fileName.localeCompare(b.fileName)).forEach(file => {
+                    const icon = getFileIcon(file.fileName);
+                    html += `<div class="file-item" data-path="${file.path}" onclick="openFileInEditor('${file.path}')" style="padding-left: 20px;">
+                        <i class="${icon}"></i> ${file.fileName}
+                    </div>`;
+                });
+            });
+
+            fileTreeContainer.innerHTML = html;
+        }
+
+        function getFileIcon(fileName) {
+            const ext = fileName.split('.').pop().toLowerCase();
+            const iconMap = {
+                'js': 'fa-brands fa-js',
+                'ts': 'fa-brands fa-js',
+                'jsx': 'fa-brands fa-react',
+                'tsx': 'fa-brands fa-react',
+                'html': 'fa-brands fa-html5',
+                'css': 'fa-brands fa-css3-alt',
+                'json': 'fa-solid fa-code',
+                'md': 'fa-solid fa-file-lines',
+                'txt': 'fa-solid fa-file-lines',
+                'py': 'fa-brands fa-python',
+                'java': 'fa-brands fa-java',
+                'php': 'fa-brands fa-php',
+                'rb': 'fa-solid fa-gem',
+                'go': 'fa-solid fa-code',
+                'rs': 'fa-solid fa-code',
+                'cpp': 'fa-solid fa-code',
+                'c': 'fa-solid fa-code',
+                'h': 'fa-solid fa-code',
+                'sql': 'fa-solid fa-database',
+                'xml': 'fa-solid fa-code',
+                'yml': 'fa-solid fa-code',
+                'yaml': 'fa-solid fa-code',
+                'sh': 'fa-solid fa-terminal',
+                'bat': 'fa-solid fa-terminal',
+                'ps1': 'fa-solid fa-terminal'
+            };
+            return iconMap[ext] || 'fa-regular fa-file';
+        }
+
+        async function openFileInEditor(filePath) {
+            // Check if file is already open
+            const existingTabIndex = openTabs.findIndex(tab => tab.path === filePath);
+            if (existingTabIndex !== -1) {
+                switchToTab(existingTabIndex);
+                return;
+            }
+
+            // Add new tab
+            const fileName = filePath.split('/').pop();
+            const newTab = {
+                path: filePath,
+                name: fileName,
+                language: getFileLanguage(fileName)
+            };
+
+            openTabs.push(newTab);
+            currentTabIndex = openTabs.length - 1;
+
+            // Show loading state
+            renderTabs();
+            switchToTab(currentTabIndex);
+            document.getElementById('code-editor').value = 'Loading...';
+            document.getElementById('code-editor').disabled = true;
+
+            // Load file content
+            try {
+                const response = await fetch(`/api/file-content?owner=${currentRepo.owner.login}&repo=${currentRepo.name}&path=${encodeURIComponent(filePath)}`);
+                if (!response.ok) throw new Error('Failed to load file');
+
+                const data = await response.json();
+                
+                // Check if it's an image file
+                const isImage = /\.(jpg|jpeg|png|gif|svg|webp|ico|bmp)$/i.test(filePath);
+                if (isImage) {
+                    // Display image instead of text editor
+                    displayImageInEditor(fileName, data.content, filePath);
+                } else {
+                    fileContents[filePath] = data.content;
+                    fileShas[filePath] = data.sha;
+                    
+                    document.getElementById('code-editor').value = data.content;
+                    document.getElementById('code-editor').disabled = false;
+                    document.getElementById('editor-save-btn').disabled = false;
+                    document.getElementById('editor-commit-btn').disabled = false;
+                }
+
+                loadFileContent(filePath);
+            } catch (error) {
+                console.error('Error loading file:', error);
+                document.getElementById('code-editor').value = `Error loading file: ${error.message}`;
+                document.getElementById('code-editor').disabled = true;
+                document.getElementById('editor-save-btn').disabled = true;
+                document.getElementById('editor-commit-btn').disabled = true;
+            }
+        }
+
+        function displayImageInEditor(fileName, imageContent, filePath) {
+            const editorContainer = document.querySelector('.editor-content');
+            const fileExtension = fileName.split('.').pop().toLowerCase();
+            
+            // Determine MIME type based on file extension
+            const mimeTypes = {
+                'jpg': 'image/jpeg',
+                'jpeg': 'image/jpeg',
+                'png': 'image/png',
+                'gif': 'image/gif',
+                'svg': 'image/svg+xml',
+                'webp': 'image/webp',
+                'ico': 'image/x-icon',
+                'bmp': 'image/bmp'
+            };
+            
+            const mimeType = mimeTypes[fileExtension] || 'image/png';
+            
+            // Create image viewer HTML
+            editorContainer.innerHTML = `
+                <div class="image-viewer">
+                    <div class="image-header">
+                        <span class="image-filename">${fileName}</span>
+                        <div class="image-actions">
+                            <button class="image-action-btn" id="download-btn" data-filename="${fileName}" data-content="${imageContent}" data-mime="${mimeType}">
+                                <i class="fa-solid fa-download"></i> Download
+                            </button>
+                            <button class="image-action-btn" id="open-btn" data-filename="${fileName}" data-content="${imageContent}" data-mime="${mimeType}">
+                                <i class="fa-solid fa-external-link-alt"></i> Open
+                            </button>
+                        </div>
+                    </div>
+                    <div class="image-container">
+                        <img src="data:${mimeType};base64,${imageContent}" alt="${fileName}" class="image-display" />
+                    </div>
+                    <div class="image-info">
+                        <div class="image-details">
+                            <span><strong>File:</strong> ${fileName}</span>
+                            <span><strong>Type:</strong> ${mimeType}</span>
+                            <span><strong>Size:</strong> ${formatFileSize(imageContent.length * 0.75)}</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // Add event listeners for the buttons
+            document.getElementById('download-btn').addEventListener('click', function() {
+                const fileName = this.getAttribute('data-filename');
+                const imageContent = this.getAttribute('data-content');
+                const mimeType = this.getAttribute('data-mime');
+                
+                // Visual feedback
+                this.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Downloading...';
+                this.disabled = true;
+                
+                setTimeout(() => {
+                    downloadImage(fileName, imageContent, mimeType);
+                    // Reset button
+                    this.innerHTML = '<i class="fa-solid fa-download"></i> Download';
+                    this.disabled = false;
+                }, 100);
+            });
+            
+            document.getElementById('open-btn').addEventListener('click', function() {
+                const fileName = this.getAttribute('data-filename');
+                const imageContent = this.getAttribute('data-content');
+                const mimeType = this.getAttribute('data-mime');
+                
+                // Visual feedback
+                this.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Opening...';
+                this.disabled = true;
+                
+                setTimeout(() => {
+                    openImageInNewTab(fileName, imageContent, mimeType);
+                    // Reset button
+                    this.innerHTML = '<i class="fa-solid fa-external-link-alt"></i> Open';
+                    this.disabled = false;
+                }, 100);
+            });
+            
+            // Disable save and commit buttons for images
+            document.getElementById('editor-save-btn').disabled = true;
+            document.getElementById('editor-commit-btn').disabled = true;
+            
+            // Store image data for potential future use
+            fileContents[filePath] = imageContent;
+            fileShas[filePath] = 'image-file';
+        }
+
+        function downloadImage(fileName, imageContent, mimeType) {
+            try {
+                // Create a blob from the base64 data
+                const byteCharacters = atob(imageContent);
+                const byteNumbers = new Array(byteCharacters.length);
+                for (let i = 0; i < byteCharacters.length; i++) {
+                    byteNumbers[i] = byteCharacters.charCodeAt(i);
+                }
+                const byteArray = new Uint8Array(byteNumbers);
+                const blob = new Blob([byteArray], { type: mimeType });
+                
+                // Create download link
+                const url = window.URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = fileName;
+                link.style.display = 'none';
+                
+                // Trigger download
+                document.body.appendChild(link);
+                link.click();
+                
+                // Cleanup
+                document.body.removeChild(link);
+                window.URL.revokeObjectURL(url);
+                
+                console.log(`Downloading ${fileName}`);
+            } catch (error) {
+                console.error('Error downloading image:', error);
+                alert('Failed to download image. Please try again.');
+            }
+        }
+
+        function openImageInNewTab(fileName, imageContent, mimeType) {
+            try {
+                const newWindow = window.open('', '_blank');
+                if (!newWindow) {
+                    alert('Please allow popups to open images in new tab');
+                    return;
+                }
+                
+                newWindow.document.write(`
+                    <!DOCTYPE html>
+                    <html>
+                        <head>
+                            <title>${fileName}</title>
+                            <style>
+                                body { 
+                                    margin: 0; 
+                                    padding: 20px; 
+                                    background: #1e1e1e; 
+                                    color: white; 
+                                    font-family: Arial, sans-serif;
+                                    display: flex;
+                                    flex-direction: column;
+                                    align-items: center;
+                                    min-height: 100vh;
+                                }
+                                .header { 
+                                    margin-bottom: 20px; 
+                                    text-align: center;
+                                }
+                                img { 
+                                    max-width: 100%; 
+                                    max-height: 80vh;
+                                    height: auto; 
+                                    border-radius: 8px;
+                                    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+                                }
+                                .close-btn {
+                                    position: fixed;
+                                    top: 20px;
+                                    right: 20px;
+                                    background: #d73a49;
+                                    color: white;
+                                    border: none;
+                                    padding: 10px 15px;
+                                    border-radius: 6px;
+                                    cursor: pointer;
+                                    font-size: 14px;
+                                }
+                                .close-btn:hover {
+                                    background: #b31d28;
+                                }
+                            </style>
+                        </head>
+                        <body>
+                            <button class="close-btn" onclick="window.close()">Close</button>
+                            <div class="header">
+                                <h2>${fileName}</h2>
+                            </div>
+                            <img src="data:${mimeType};base64,${imageContent}" alt="${fileName}" />
+                        </body>
+                    </html>
+                `);
+                newWindow.document.close();
+                
+                console.log(`Opening ${fileName} in new tab`);
+            } catch (error) {
+                console.error('Error opening image in new tab:', error);
+                alert('Failed to open image in new tab. Please try again.');
+            }
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        function getFileLanguage(fileName) {
+            const ext = fileName.split('.').pop().toLowerCase();
+            const languageMap = {
+                'js': 'javascript',
+                'ts': 'typescript',
+                'jsx': 'javascript',
+                'tsx': 'typescript',
+                'html': 'html',
+                'css': 'css',
+                'json': 'json',
+                'md': 'markdown',
+                'txt': 'text',
+                'py': 'python',
+                'java': 'java',
+                'php': 'php',
+                'rb': 'ruby',
+                'go': 'go',
+                'rs': 'rust',
+                'cpp': 'cpp',
+                'c': 'c',
+                'h': 'cpp',
+                'sql': 'sql',
+                'xml': 'xml',
+                'yml': 'yaml',
+                'yaml': 'yaml',
+                'sh': 'bash',
+                'bat': 'batch',
+                'ps1': 'powershell'
+            };
+            return languageMap[ext] || 'text';
+        }
+
+        function renderTabs() {
+            const tabsContainer = document.getElementById('editor-tabs');
+            tabsContainer.innerHTML = openTabs.map((tab, index) => `
+                <div class="editor-tab ${index === currentTabIndex ? 'active' : ''}" onclick="switchToTab(${index})">
+                    <span>${tab.name}</span>
+                    <button class="close-tab" onclick="closeTab(${index}, event)">
+                        <i class="fa-solid fa-times"></i>
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        function switchToTab(index) {
+            if (index < 0 || index >= openTabs.length) return;
+            
+            currentTabIndex = index;
+            const tab = openTabs[index];
+            
+            renderTabs();
+            loadFileContent(tab.path);
+            updateEditorLanguage(tab.language);
+            
+            // Update save/commit button states
+            const isImage = /\.(jpg|jpeg|png|gif|svg|webp|ico|bmp)$/i.test(tab.path);
+            if (isImage) {
+                document.getElementById('editor-save-btn').disabled = true;
+                document.getElementById('editor-commit-btn').disabled = true;
+            } else {
+                updateSaveButton();
+            }
+        }
+
+        function closeTab(index, event) {
+            if (event) event.stopPropagation();
+            
+            if (openTabs.length === 1) {
+                closeEditorModal();
+                return;
+            }
+
+            openTabs.splice(index, 1);
+            
+            if (currentTabIndex >= index) {
+                currentTabIndex = Math.max(0, currentTabIndex - 1);
+            }
+            
+            renderTabs();
+            if (openTabs.length > 0) {
+                switchToTab(currentTabIndex);
+            }
+        }
+
+        function loadFileContent(filePath) {
+            const content = fileContents[filePath] || '';
+            const editor = document.getElementById('code-editor');
+            const editorContainer = document.querySelector('.editor-content');
+            
+            // Check if it's an image file
+            const isImage = /\.(jpg|jpeg|png|gif|svg|webp|ico|bmp)$/i.test(filePath);
+            
+            if (isImage && content) {
+                // Show image viewer
+                const fileName = filePath.split('/').pop();
+                displayImageInEditor(fileName, content, filePath);
+            } else {
+                // Show text editor
+                editorContainer.innerHTML = '<textarea id="code-editor" spellcheck="false"></textarea>';
+                const newEditor = document.getElementById('code-editor');
+                newEditor.value = content;
+                
+                // Re-attach event listener
+                newEditor.addEventListener('input', () => {
+                    hasUnsavedChanges = true;
+                    updateSaveButton();
+                });
+                
+                // Reset change tracking
+                hasUnsavedChanges = false;
+                updateSaveButton();
+                
+                // Focus editor
+                newEditor.focus();
+            }
+        }
+
+        function updateEditorLanguage(language) {
+            const editorContent = document.querySelector('.editor-content');
+            editorContent.setAttribute('data-language', language);
+        }
+
+        function updateSaveButton() {
+            const saveBtn = document.getElementById('editor-save-btn');
+            const commitBtn = document.getElementById('editor-commit-btn');
+            
+            saveBtn.disabled = !hasUnsavedChanges;
+            commitBtn.disabled = !hasUnsavedChanges;
+        }
+
+        function closeEditorModal() {
+            if (hasUnsavedChanges) {
+                if (!confirm('You have unsaved changes. Are you sure you want to close?')) {
+                    return;
+                }
+            }
+            
+            document.getElementById('editor-modal-overlay').style.display = 'none';
+            document.getElementById('dashboard-home').style.display = 'block';
+            
+            // Reset state
+            openTabs = [];
+            currentTabIndex = -1;
+            currentRepo = null;
+            fileContents = {};
+            fileShas = {};
+            hasUnsavedChanges = false;
+        }
+
+        function saveCurrentFile() {
+            if (currentTabIndex < 0 || !hasUnsavedChanges) return;
+            
+            const currentTab = openTabs[currentTabIndex];
+            const editor = document.getElementById('code-editor');
+            
+            // Don't save if it's an image file or if editor doesn't exist
+            if (!editor || /\.(jpg|jpeg|png|gif|svg|webp|ico|bmp)$/i.test(currentTab.path)) {
+                return;
+            }
+            
+            const newContent = editor.value;
+            fileContents[currentTab.path] = newContent;
+            hasUnsavedChanges = false;
+            updateSaveButton();
+            
+            // Show save confirmation
+            const saveBtn = document.getElementById('editor-save-btn');
+            const originalText = saveBtn.innerHTML;
+            saveBtn.innerHTML = '<i class="fa-solid fa-check"></i> Saved';
+            saveBtn.style.background = '#28a745';
+            
+            setTimeout(() => {
+                saveBtn.innerHTML = originalText;
+                saveBtn.style.background = '';
+            }, 2000);
+        }
+
+        function showCommitForm() {
+            document.getElementById('editor-footer').style.display = 'block';
+            document.getElementById('commit-message').focus();
+            document.getElementById('commit-message').value = `Update ${openTabs[currentTabIndex].name}`;
+        }
+
+        function hideCommitForm() {
+            document.getElementById('editor-footer').style.display = 'none';
+        }
+
+        async function commitChanges() {
+            const commitMessage = document.getElementById('commit-message').value.trim();
+            if (!commitMessage) {
+                alert('Please enter a commit message');
+                return;
+            }
+
+            const currentTab = openTabs[currentTabIndex];
+            const filePath = currentTab.path;
+            
+            // Don't allow committing image files
+            if (/\.(jpg|jpeg|png|gif|svg|webp|ico|bmp)$/i.test(filePath)) {
+                alert('Image files cannot be committed through the editor. Please use the GitHub web interface for image changes.');
+                return;
+            }
+            
+            const editor = document.getElementById('code-editor');
+            if (!editor) {
+                alert('No editor content found');
+                return;
+            }
+            
+            const newContent = editor.value;
+            const sha = fileShas[filePath];
+
+            try {
+                const response = await fetch('/api/commit-file', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        owner: currentRepo.owner.login,
+                        repo: currentRepo.name,
+                        path: filePath,
+                        message: commitMessage,
+                        content: newContent,
+                        sha: sha
+                    })
+                });
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.error || 'Failed to commit changes');
+                }
+
+                const result = await response.json();
+                
+                // Update SHA for the committed file
+                fileShas[filePath] = result.data.content.sha;
+                fileContents[filePath] = newContent;
+                hasUnsavedChanges = false;
+                updateSaveButton();
+                hideCommitForm();
+
+                // Show success message
+                const commitBtn = document.getElementById('editor-commit-btn');
+                const originalText = commitBtn.innerHTML;
+                commitBtn.innerHTML = '<i class="fa-solid fa-check"></i> Committed';
+                commitBtn.style.background = '#28a745';
+                
+                setTimeout(() => {
+                    commitBtn.innerHTML = originalText;
+                    commitBtn.style.background = '';
+                }, 3000);
+
+            } catch (error) {
+                alert('Error committing changes: ' + error.message);
+            }
+        }
+
+        // Event listeners for editor modal
+        document.getElementById('editor-close-btn').onclick = closeEditorModal;
+        document.getElementById('editor-save-btn').onclick = saveCurrentFile;
+        document.getElementById('editor-commit-btn').onclick = showCommitForm;
+        document.getElementById('commit-submit-btn').onclick = commitChanges;
+        document.getElementById('commit-cancel-btn').onclick = hideCommitForm;
+
+        // Track changes in editor
+        document.getElementById('code-editor').addEventListener('input', () => {
+            hasUnsavedChanges = true;
+            updateSaveButton();
+        });
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            if (document.getElementById('editor-modal-overlay').style.display === 'flex') {
+                // Ctrl/Cmd + S to save
+                if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+                    e.preventDefault();
+                    saveCurrentFile();
+                }
+                
+                // Ctrl/Cmd + W to close tab
+                if ((e.ctrlKey || e.metaKey) && e.key === 'w') {
+                    e.preventDefault();
+                    if (currentTabIndex >= 0) {
+                        closeTab(currentTabIndex);
+                    }
+                }
+                
+                // Escape to close modal
+                if (e.key === 'Escape') {
+                    if (document.getElementById('editor-footer').style.display === 'block') {
+                        hideCommitForm();
+                    } else {
+                        closeEditorModal();
+                    }
+                }
+            }
+        });
+
+        // Close modal when clicking outside
+        document.getElementById('editor-modal-overlay').addEventListener('click', (e) => {
+            if (e.target === document.getElementById('editor-modal-overlay')) {
+                closeEditorModal();
+            }
+        });
+
+        // Update the repo modal file click handler to open editor
+        function updateRepoModalFileHandlers() {
+            document.querySelectorAll('.modal-file-row .file-link').forEach(link => {
+                link.onclick = (e) => {
+                    e.preventDefault();
+                    const filePath = link.dataset.path;
+                    const fileName = link.textContent.trim();
+                    openEditorModal(currentRepo, filePath, fileName);
+                    document.getElementById('repo-modal-overlay').style.display = 'none';
+                };
+            });
+        }
+
+        // Update the search results file click handler
+        function updateSearchResultsFileHandlers() {
+            document.querySelectorAll('.search-file-row .file-link, .search-file-row .view-btn').forEach(btn => {
+                btn.onclick = (e) => {
+                    e.preventDefault();
+                    const repoName = btn.dataset.repo;
+                    const filePath = btn.dataset.path;
+                    const repo = allUserRepos.find(r => r.data.name === repoName).data;
+                    const fileName = filePath ? filePath.split('/').pop() : repoName;
+                    openEditorModal(repo, filePath, fileName);
+                };
+            });
+        }
+
+        // Hook up the new handlers
+        const originalRenderSearchResults = renderSearchResults;
+        renderSearchResults = function(results) {
+            originalRenderSearchResults(results);
+            updateSearchResultsFileHandlers();
+        };
+
+        const originalOpenRepoModal = openRepoModal;
+        openRepoModal = function(repo) {
+            originalOpenRepoModal(repo);
+            setTimeout(updateRepoModalFileHandlers, 100);
+        };
+
+        // Feature card click handlers
+        function handleFeatureCardClick(feature) {
+            switch(feature) {
+                case 'code':
+                    // Open editor modal with first available repo
+                    if (allUserRepos.length > 0) {
+                        openEditorModal(allUserRepos[0].data);
+                    } else {
+                        alert('No repositories available');
+                    }
+                    break;
+                case 'images':
+                    // Focus on search and set file type to images
+                    document.getElementById('main-search').focus();
+                    document.getElementById('file-type-dropdown').value = 'Images';
+                    break;
+                case 'ai':
+                    // Focus on search
+                    document.getElementById('main-search').focus();
+                    break;
+            }
+        }
+    </script>
+</body>
+
+</html>
